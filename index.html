@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Linked List Visualization</title>
+
+		<link rel="stylesheet" href="styles/general.css" />
+		<link rel="stylesheet" href="styles/header.css" />
+		<link rel="stylesheet" href="styles/canvas.css" />
+
+		<script
+			src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+			defer
+		></script>
+		<script src="scripts/LinkedList.js" defer></script>
+		<script src="scripts/SimpleCanvas.js" defer></script>
+		<script src="scripts/utility.js" defer></script>
+		<script src="scripts/main.js" defer></script>
+	</head>
+	<body>
+		<div class="header">
+			<div class="left-section">
+				<label for="dropdown"></label>
+				<select id="dropdown" class="selection">
+					<option value="Linked List">Linked List</option>
+					<option value="Doubly Linked List">
+						Doubly Linked List
+					</option>
+				</select>
+			</div>
+
+			<div class="right-section">
+				<button class="add-btn">Add</button>
+				<button class="btn">Remove</button>
+				<button class="btn">Clear</button>
+			</div>
+		</div>
+
+		<div id="main-container">
+			<canvas id="canvas"></canvas>
+		</div>
+	</body>
+</html>
