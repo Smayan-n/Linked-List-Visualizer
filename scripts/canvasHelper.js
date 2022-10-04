@@ -78,7 +78,75 @@ class SimpleCanvas {
 	//takes animation callback function and refreshes the canvas
 	refresh(callbackFunction) {
 		const canvas = this.ctx.canvas;
-		this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+		this.ctx.fillStyle = "rgba(0,0,0,1)";
+		this.ctx.fillRect(0, 0, canvas.width, canvas.height);
 		requestAnimationFrame(callbackFunction);
+	}
+}
+
+//canvas animation class
+class CanvasAnimation {
+	constructor(simpleCanvas) {
+		//takes in a SimpleCanvas object
+		this.canvas = simpleCanvas;
+		this.animFrms = 0;
+		this.circleRadOffset = 0;
+
+		this.cntx = 0;
+		this.cnty = 0;
+	}
+
+	animateCircle(circle, points, animTime, nextAnimCallback) {
+		//takes circle object
+		this.animFrms++;
+		this.canvas.circle(
+			circle.x,
+			circle.y,
+			circle.radius - 40 + this.circleRadOffset,
+			circle.data,
+			"white"
+		);
+		this.circleRadOffset += 40 / animTime;
+		if (this.circleRadOffset >= 40) {
+			this.canvas.circle(
+				circle.x,
+				circle.y,
+				circle.radius,
+				circle.data,
+				"white"
+			);
+			this.animFrms = 0;
+			this.circleRadOffset = 40;
+			return this.animateLine(points, animTime, null);
+		}
+	}
+
+	animateLine(points, animTime, nextAnimCallback) {
+		this.animFrms++;
+
+		const distX = points.x1 - points.x2;
+		const distY = points.y1 - points.y2;
+
+		this.canvas.arrow(
+			points.x1,
+			points.y1,
+			points.x1 - this.cntx,
+			points.y1 - this.cnty,
+			5,
+			"blue"
+		);
+		this.cntx += distX / animTime;
+		this.cnty += distY / animTime;
+
+		if (
+			Math.abs(this.cntx) >= Math.abs(distX) ||
+			Math.abs(this.cnty) >= Math.abs(distY)
+		) {
+			this.cntx = 0;
+			this.cnty = 0;
+			this.animFrms = 0;
+			this.circleRadOffset = 0;
+			return true;
+		}
 	}
 }

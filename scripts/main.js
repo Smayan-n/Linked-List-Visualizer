@@ -4,6 +4,7 @@ canvas.height = window.innerHeight - canvas.offsetTop - 4;
 
 const ctx = canvas.getContext("2d");
 const drawing = new SimpleCanvas(ctx);
+const animation = new CanvasAnimation(drawing);
 
 //handle draging on nodes
 canvas.addEventListener("mousedown", (e) => {
@@ -38,6 +39,8 @@ const ll = new LinkedList([1, 2, 3, 4, 6, 8, 12, 34, 56, 789]);
 let circles = ll.getDrawableNodes();
 let animStart = false;
 let newTail = null;
+
+$(".remove-btn").on("click", () => {});
 
 $(".add-btn").on("click", () => {
 	ll.append(43);
@@ -103,47 +106,67 @@ function draw() {
 
 	if (animStart) {
 		animFrms++;
-
-		drawing.circle(
+		// const ci = 10;
+		const tail = circles[circles.length - 1];
+		const p = getPointsOnCircumfrence(
+			tail.x,
+			tail.y,
 			newTail.x,
 			newTail.y,
-			newTail.radius,
-			newTail.data,
-			"white"
+			tail.radius
 		);
-
-		if (animFrms >= 12) {
-			const tail = circles[circles.length - 1];
-			const p = getPointsOnCircumfrence(
-				tail.x,
-				tail.y,
-				newTail.x,
-				newTail.y,
-				tail.radius
-			);
-			const distX = p.x1 - p.x2;
-			const distY = p.y1 - p.y2;
-
-			drawing.arrow(p.x1, p.y1, p.x1 - cntx, p.y1 - cnty, 5, "blue");
-			const speed = 40;
-			cntx += distX / speed;
-			cnty += distY / speed;
-
-			console.log(cntx, cnty, distX, distY);
-
-			//animation over
-			if (
-				Math.abs(cntx) >= Math.abs(distX) ||
-				Math.abs(cnty) >= Math.abs(distY)
-			) {
-				cntx = 0;
-				cnty = 0;
-				animFrms = 0;
-				circles.push(newTail);
-				animStart = false;
-			}
+		const output = animation.animateCircle(newTail, p, 15, null);
+		//if return value is true, animation is completed
+		if (output) {
+			animStart = false;
+			animFrms = 0;
+			circles.push(newTail);
 		}
+
+		// drawing.circle(
+		// 	newTail.x,
+		// 	newTail.y,
+		// 	newTail.radius - 40,
+		// 	newTail.data,
+		// 	"white"
+		// );
+		// if (animFrms <= ci) {
+		// 	newTail.radius += 40 / ci;
+		// }
 	}
+
+	// if (animFrms >= ci + 2) {
+	// 	const tail = circles[circles.length - 1];
+	// 	const p = getPointsOnCircumfrence(
+	// 		tail.x,
+	// 		tail.y,
+	// 		newTail.x,
+	// 		newTail.y,
+	// 		tail.radius
+	// 	);
+	// 	const distX = p.x1 - p.x2;
+	// 	const distY = p.y1 - p.y2;
+
+	// 	drawing.arrow(p.x1, p.y1, p.x1 - cntx, p.y1 - cnty, 5, "blue");
+	// 	const speed = 20;
+	// 	cntx += distX / speed;
+	// 	cnty += distY / speed;
+
+	// 	console.log(cntx, cnty, distX, distY);
+
+	// 	//animation over
+	// 	if (
+	// 		Math.abs(cntx) >= Math.abs(distX) ||
+	// 		Math.abs(cnty) >= Math.abs(distY)
+	// 	) {
+	// 		cntx = 0;
+	// 		cnty = 0;
+	// 		animFrms = 0;
+	// 		circles.push(newTail);
+	// 		animStart = false;
+	// 	}
+	// 	}
+	// }
 
 	frames++;
 	//drawing circles
