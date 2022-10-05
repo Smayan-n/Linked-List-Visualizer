@@ -32,6 +32,37 @@ class LinkedList {
 		this.tail = node;
 	}
 
+	insertAtIndex(data, index) {
+		if (!this.head) {
+			return;
+		}
+		if (index === 0) {
+			this.prepend(data);
+			return;
+		}
+		if (index === this.length()) {
+			this.append(data);
+			return;
+		}
+
+		const newNode = new Node(data);
+		let curr = this.head;
+		let currIndex = 0;
+		while (curr) {
+			if (currIndex === index - 1) {
+				newNode.prev = curr;
+				newNode.next = curr.next;
+				curr.next = newNode;
+				if (curr.next.next) {
+					curr.next.next.prev = newNode;
+				}
+				return;
+			}
+			currIndex++;
+			curr = curr.next;
+		}
+	}
+
 	prepend(data) {
 		//add node to the start of linked list
 		const node = new Node(data);
@@ -57,7 +88,7 @@ class LinkedList {
 		//also places nodes in proper positions (good (x, y) coords)
 
 		const nodes = [];
-		let curr = ll.head;
+		let curr = self.head;
 
 		let x = 75;
 		let y = 75;

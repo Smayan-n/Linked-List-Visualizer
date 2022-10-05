@@ -3,12 +3,13 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight - canvas.offsetTop - 4;
 
 const ctx = canvas.getContext("2d");
-const drawing = new SimpleCanvas(ctx);
-const animation = new CanvasAnimation(drawing);
+const simpleCanvas = new SimpleCanvas(ctx);
+const animator = new CanvasAnimation(simpleCanvas);
+const canvasObjHandler = new CanvasObjectHandler(simpleCanvas);
 
 //handle draging on nodes
 canvas.addEventListener("mousedown", (e) => {
-	nodes.forEach((circle) => {
+	canvasObjHandler.circles.forEach((circle) => {
 		//get x and y offsets on canvas
 		const clickX = e.offsetX,
 			clickY = e.offsetY;
@@ -24,6 +25,9 @@ canvas.addEventListener("mousedown", (e) => {
 				dy: circle.y - clickY,
 			};
 			canvas.onmousemove = (e) => {
+				//update arrows as well
+				canvasObjHandler.generateArrows();
+
 				circle.x = e.offsetX + offsets.dx;
 				circle.y = e.offsetY + offsets.dy;
 			};
@@ -36,111 +40,163 @@ canvas.addEventListener("mousedown", (e) => {
 });
 
 const ll = new LinkedList([1, 2, 4, 6, 7, 8]);
-let nodes = ll.getDrawableNodes();
+canvasObjHandler.generateCircles(ll);
+canvasObjHandler.generateArrows();
+// let nodes = canvasObjHandler.circles;
 let addAnimStart = false;
 let prependAnimStart = false;
+let insertAnimStart = false;
 let newNode = null;
+let newArrow = null;
+let animationObjects = [];
+
+$(".insert-btn").on("click", () => {
+	ll.insertAtIndex(40, 2);
+	animationObjects = canvasObjHandler.getAnimationValues(ll, 2);
+	newNode = animationObjects[0];
+	insertAnimStart = true;
+});
 
 $(".prepend-btn").on("click", () => {
 	ll.prepend(12);
-	const newNodes = ll.getDrawableNodes();
-	nodes = newNodes.slice(1, newNodes.length);
-	newNode = newNodes[0]; //first
+	animationObjects = canvasObjHandler.getAnimationValues(ll, 0);
+	newNode = animationObjects[0];
+	newArrow = animationObjects[1];
 	prependAnimStart = true;
+
+	// const newNodes = ll.getDrawableNodes();
+	// nodes = newNodes.slice(1, newNodes.length);
+	// newNode = newNodes[0]; //first
+	// prependAnimStart = true;
 });
 
 $(".add-btn").on("click", () => {
 	ll.append(43);
-	const newNodes = ll.getDrawableNodes();
-	nodes = newNodes.slice(0, newNodes.length - 1);
-	newNode = newNodes[newNodes.length - 1]; //last
+	animationObjects = canvasObjHandler.getAnimationValues(ll, ll.length() - 1);
+	newNode = animationObjects[0];
+	newArrow = animationObjects[1];
 	addAnimStart = true;
-	// add();
 });
 
-function animate(c1, c2, type) {
-	//type will be either append or prepend
-}
-
 let frames = 0;
+let animFrames = 0;
+const animSpeed = 25;
 
-//start drawing
+//start simpleCanvas
 draw();
 function draw() {
 	//refresh canvas and get new animation frame
-	drawing.refresh(draw);
+	simpleCanvas.refresh(draw);
 
-	//drawing arrows
-	for (let i = 0; i < nodes.length - 1; i++) {
-		const p = getPointsOnCircumfrence(
-			nodes[i].x,
-			nodes[i].y,
-			nodes[i + 1].x,
-			nodes[i + 1].y,
-			nodes[i + 1].radius
-		);
-		drawing.arrow(p.x1, p.y1, p.x2, p.y2, 5, "red");
-		//for doubly linked list
-		// drawing.arrow(p.x2, p.y2, p.x1, p.y1, 4, "red");
-	}
-
-	//drawing nodes
-	nodes.forEach((circle, index) => {
-		drawing.circle(
-			circle.x,
-			circle.y,
-			circle.radius,
-			circle.data,
-			//head is green tail is blue, and rest are white
-			index === 0
-				? "green"
-				: index === nodes.length - 1
-				? "#33ccff"
-				: "white"
-		);
-	});
+	//drawing objects
+	canvasObjHandler.drawArrows();
+	canvasObjHandler.drawCircles();
 
 	if (addAnimStart) {
-		if (animation.animateCircle(newNode, 20)) {
-			//
-			const tail = nodes[nodes.length - 1];
-			const points = getPointsOnCircumfrence(
-				tail.x,
-				tail.y,
-				newNode.x,
-				newNode.y,
-				tail.radius
-			);
-			if (animation.animateLine(points, 20)) {
-				addAnimStart = false;
-				animation.reset();
-				nodes.push(newNode);
-			}
+		// if (animator.animateCircle(newNode, 20)) {
+		// 	//
+		// 	const oldNode = nodes[nodes.length - 1];
+		// 	const points = getPointsOnCircumfrence(
+		// 		oldNode.x,
+		// 		oldNode.y,
+		// 		newNode.x,
+		// 		newNode.y,
+		// 		oldNode.radius
+		// 	);
+		// 	if (animator.animateLine(points, 20)) {
+		// 		addAnimStart = false;
+		// 		animator.reset();
+		// 		nodes.push(newNode);
+		// 	}
+		// }
+		animFrames++;
+		if (animFrames < animSpeed) {
+			animator.animateCircle(newNode, animSpeed);
+		}
+		if (animFrames === animSpeed) {
+			canvasObjHandler.circles.push(newNode);
+		}
+		if (animFrames > animSpeed && animFrames < animSpeed * 2) {
+			animator.animateLine(newArrow, animSpeed);
+		}
+		if (animFrames > animSpeed * 2) {
+			canvasObjHandler.arrows.push(newArrow);
+			addAnimStart = false;
+			animator.reset();
+			animFrames = 0;
 		}
 	}
 
 	if (prependAnimStart) {
-		if (animation.animateCircle(newNode, 20)) {
-			//
-			const tail = nodes[0];
-			const points = getPointsOnCircumfrence(
-				newNode.x,
-				newNode.y,
-				tail.x,
-				tail.y,
-				tail.radius
-			);
-			if (animation.animateLine(points, 20)) {
-				prependAnimStart = false;
-				animation.reset();
-				nodes.unshift(newNode);
-			}
+		// if (animator.animateCircle(newNode, 20)) {
+		// 	//
+		// 	const oldNode = canvasObjHandler.circles[0];
+		// 	const points = getPointsOnCircumfrence(
+		// 		newNode.x,
+		// 		newNode.y,
+		// 		oldNode.x,
+		// 		oldNode.y,
+		// 		oldNode.radius
+		// 	);
+		// 	if (animator.animateLine(points, 20)) {
+		// 		prependAnimStart = false;
+		// 		animator.reset();
+		// 		canvasObjHandler.circles.unshift(newNode);
+		// 		canvasObjHandler.arrows.unshift(newArrow);
+		// 	}
+		// }
+		animFrames++;
+
+		if (animFrames < animSpeed) {
+			animator.animateCircle(newNode, animSpeed);
+		}
+		if (animFrames === animSpeed) {
+			canvasObjHandler.circles.unshift(newNode);
+		}
+		if (animFrames > animSpeed && animFrames < animSpeed * 2) {
+			animator.animateLine(newArrow, animSpeed);
+		}
+		if (animFrames > animSpeed * 2) {
+			canvasObjHandler.arrows.unshift(newArrow);
+			prependAnimStart = false;
+			animator.reset();
+			animFrames = 0;
 		}
 	}
 
+	if (insertAnimStart) {
+		const leftArrow = animationObjects[1];
+		const rightArrow = animationObjects[2];
+
+		if (animFrames >= 0 && animFrames < 20) {
+			animator.animateCircle(newNode, 20);
+		}
+		if (animFrames === 20) {
+			canvasObjHandler.circles.splice(2, 0, newNode);
+		}
+		if (animFrames >= 20 && animFrames < 40) {
+			animator.animateLine(leftArrow, 20);
+		}
+		if (animFrames === 40) {
+			canvasObjHandler.arrows.splice(1, 0, leftArrow);
+		}
+		if (animFrames >= 40 && animFrames < 60) {
+			animator.animateLine(rightArrow, 20);
+		}
+		if (animFrames === 60) {
+			canvasObjHandler.arrows.splice(2, 0, rightArrow);
+		}
+		if (animFrames > 60) {
+			insertAnimStart = false;
+			animator.reset();
+		}
+
+		animFrames++;
+	}
+
 	frames++;
-	//drawing nodes
+	//simpleCanvas nodes
 	// nodes.forEach(circle => {
-	//     drawing.circle(circle.x, circle.y, circle.radius, circle.data, circle.click === true ? "green" : "white");
+	//     simpleCanvas.circle(circle.x, circle.y, circle.radius, circle.data, circle.click === true ? "green" : "white");
 	// });
 }

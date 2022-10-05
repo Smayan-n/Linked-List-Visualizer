@@ -94,6 +94,8 @@ class CanvasAnimation {
 
 		this.cntx = 0;
 		this.cnty = 0;
+		this.cntx2 = 0;
+		this.cnty2 = 0;
 	}
 
 	animateCircle(circle, animTime) {
@@ -116,7 +118,7 @@ class CanvasAnimation {
 				"white"
 			);
 			this.animFrms = 0;
-			this.circleRadOffset = 40;
+			this.circleRadOffset = 0;
 			return true;
 		}
 	}
@@ -145,7 +147,34 @@ class CanvasAnimation {
 			this.cntx = 0;
 			this.cnty = 0;
 			this.animFrms = 0;
-			this.circleRadOffset = 0;
+			return true;
+		}
+	}
+
+	animateMoveLine(points, animTime) {
+		this.animFrms++;
+
+		const distX = points.x1 - points.x2;
+		const distY = points.y1 - points.y2;
+
+		this.canvas.arrow(
+			points.x1,
+			points.y1,
+			points.x1 - this.cntx2,
+			points.y1 - this.cnty2,
+			5,
+			"blue"
+		);
+		this.cntx2 += distX / animTime;
+		this.cnty2 += distY / animTime;
+
+		if (
+			Math.abs(this.cntx2) >= Math.abs(distX) ||
+			Math.abs(this.cnty2) >= Math.abs(distY)
+		) {
+			this.cntx2 = 0;
+			this.cnty2 = 0;
+			this.animFrms = 0;
 			return true;
 		}
 	}
@@ -155,5 +184,7 @@ class CanvasAnimation {
 		this.circleRadOffset = 0;
 		this.cntx = 0;
 		this.cnty = 0;
+		this.cntx2 = 0;
+		this.cnty2 = 0;
 	}
 }
