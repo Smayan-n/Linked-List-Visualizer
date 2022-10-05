@@ -39,7 +39,7 @@ canvas.addEventListener("mousedown", (e) => {
 	});
 });
 
-const ll = new LinkedList([1, 2, 4, 6, 7, 8]);
+const ll = new LinkedList([1, 2]);
 canvasObjHandler.generateCircles(ll);
 canvasObjHandler.generateArrows();
 // let nodes = canvasObjHandler.circles;
@@ -50,9 +50,10 @@ let newNode = null;
 let newArrow = null;
 let animationObjects = [];
 
+const insertIndex = 1;
 $(".insert-btn").on("click", () => {
-	ll.insertAtIndex(40, 2);
-	animationObjects = canvasObjHandler.getAnimationValues(ll, 2);
+	ll.insertAtIndex(40, insertIndex);
+	animationObjects = canvasObjHandler.getAnimationValues(ll, insertIndex);
 	newNode = animationObjects[0];
 	insertAnimStart = true;
 });
@@ -63,11 +64,6 @@ $(".prepend-btn").on("click", () => {
 	newNode = animationObjects[0];
 	newArrow = animationObjects[1];
 	prependAnimStart = true;
-
-	// const newNodes = ll.getDrawableNodes();
-	// nodes = newNodes.slice(1, newNodes.length);
-	// newNode = newNodes[0]; //first
-	// prependAnimStart = true;
 });
 
 $(".add-btn").on("click", () => {
@@ -78,9 +74,9 @@ $(".add-btn").on("click", () => {
 	addAnimStart = true;
 });
 
-let frames = 0;
 let animFrames = 0;
-const animSpeed = 25;
+//higher is slower
+const animSpeed = 30;
 
 //start simpleCanvas
 draw();
@@ -128,23 +124,6 @@ function draw() {
 	}
 
 	if (prependAnimStart) {
-		// if (animator.animateCircle(newNode, 20)) {
-		// 	//
-		// 	const oldNode = canvasObjHandler.circles[0];
-		// 	const points = getPointsOnCircumfrence(
-		// 		newNode.x,
-		// 		newNode.y,
-		// 		oldNode.x,
-		// 		oldNode.y,
-		// 		oldNode.radius
-		// 	);
-		// 	if (animator.animateLine(points, 20)) {
-		// 		prependAnimStart = false;
-		// 		animator.reset();
-		// 		canvasObjHandler.circles.unshift(newNode);
-		// 		canvasObjHandler.arrows.unshift(newArrow);
-		// 	}
-		// }
 		animFrames++;
 
 		if (animFrames < animSpeed) {
@@ -165,38 +144,34 @@ function draw() {
 	}
 
 	if (insertAnimStart) {
+		animFrames++;
+
 		const leftArrow = animationObjects[1];
 		const rightArrow = animationObjects[2];
 
-		if (animFrames >= 0 && animFrames < 20) {
-			animator.animateCircle(newNode, 20);
+		if (animFrames < animSpeed) {
+			animator.animateCircle(newNode, animSpeed);
 		}
-		if (animFrames === 20) {
-			canvasObjHandler.circles.splice(2, 0, newNode);
+		if (animFrames === animSpeed) {
+			canvasObjHandler.circles.splice(insertIndex, 0, newNode);
 		}
-		if (animFrames >= 20 && animFrames < 40) {
-			animator.animateLine(leftArrow, 20);
+		if (animFrames >= animSpeed && animFrames < animSpeed * 2) {
+			animator.animateLine(leftArrow, animSpeed);
 		}
-		if (animFrames === 40) {
-			canvasObjHandler.arrows.splice(1, 0, leftArrow);
+		if (animFrames === animSpeed * 2) {
+			animator.reset(); //to avoid any weird line drawing
+			canvasObjHandler.arrows.splice(insertIndex - 1, 0, leftArrow);
 		}
-		if (animFrames >= 40 && animFrames < 60) {
-			animator.animateLine(rightArrow, 20);
+		if (animFrames >= animSpeed * 2 && animFrames < animSpeed * 3) {
+			animator.animateLine(rightArrow, animSpeed);
 		}
-		if (animFrames === 60) {
-			canvasObjHandler.arrows.splice(2, 0, rightArrow);
+		if (animFrames === animSpeed * 3) {
+			canvasObjHandler.arrows.splice(insertIndex, 0, rightArrow);
 		}
-		if (animFrames > 60) {
+		if (animFrames > animSpeed * 3) {
 			insertAnimStart = false;
+			animFrames = 0;
 			animator.reset();
 		}
-
-		animFrames++;
 	}
-
-	frames++;
-	//simpleCanvas nodes
-	// nodes.forEach(circle => {
-	//     simpleCanvas.circle(circle.x, circle.y, circle.radius, circle.data, circle.click === true ? "green" : "white");
-	// });
 }
