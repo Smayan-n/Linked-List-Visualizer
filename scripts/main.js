@@ -8,7 +8,7 @@ const animation = new CanvasAnimation(drawing);
 
 //handle draging on nodes
 canvas.addEventListener("mousedown", (e) => {
-	circles.forEach((circle) => {
+	nodes.forEach((circle) => {
 		//get x and y offsets on canvas
 		const clickX = e.offsetX,
 			clickY = e.offsetY;
@@ -35,36 +35,34 @@ canvas.addEventListener("mousedown", (e) => {
 	});
 });
 
-const ll = new LinkedList([1, 2, 3, 4, 6, 8, 12, 34, 56, 789]);
-let circles = ll.getDrawableNodes();
-let animStart = false;
-let newTail = null;
+const ll = new LinkedList([1, 2, 4, 6, 7, 8]);
+let nodes = ll.getDrawableNodes();
+let addAnimStart = false;
+let prependAnimStart = false;
+let newNode = null;
 
-$(".remove-btn").on("click", () => {});
+$(".prepend-btn").on("click", () => {
+	ll.prepend(12);
+	const newNodes = ll.getDrawableNodes();
+	nodes = newNodes.slice(1, newNodes.length);
+	newNode = newNodes[0]; //first
+	prependAnimStart = true;
+});
 
 $(".add-btn").on("click", () => {
 	ll.append(43);
-	const newCircles = ll.getDrawableNodes();
-	circles = newCircles.slice(0, newCircles.length - 1);
-	newTail = newCircles[newCircles.length - 1];
-	animStart = true;
+	const newNodes = ll.getDrawableNodes();
+	nodes = newNodes.slice(0, newNodes.length - 1);
+	newNode = newNodes[newNodes.length - 1]; //last
+	addAnimStart = true;
 	// add();
 });
 
-function add() {
-	const tail = circles[circles.length - 2];
-	const newCircle = circles[circles.length - 1];
-	const dist = distance(tail.x, tail.y, newCircle.x, newCircle.y);
-	for (let i = 0; i < dist; i++) {
-		// ctx.clearRect(0, 0, canvas.width, canvas.height);
-		drawing.arrow(tail.x, tail.y, tail.x + i, tail.y + i, 5, "red");
-	}
+function animate(c1, c2, type) {
+	//type will be either append or prepend
 }
 
 let frames = 0;
-let cntx = 0;
-let cnty = 0;
-let animFrms = 0;
 
 //start drawing
 draw();
@@ -73,104 +71,76 @@ function draw() {
 	drawing.refresh(draw);
 
 	//drawing arrows
-	for (let i = 0; i < circles.length - 1; i++) {
+	for (let i = 0; i < nodes.length - 1; i++) {
 		const p = getPointsOnCircumfrence(
-			circles[i].x,
-			circles[i].y,
-			circles[i + 1].x,
-			circles[i + 1].y,
-			circles[i + 1].radius
+			nodes[i].x,
+			nodes[i].y,
+			nodes[i + 1].x,
+			nodes[i + 1].y,
+			nodes[i + 1].radius
 		);
 		drawing.arrow(p.x1, p.y1, p.x2, p.y2, 5, "red");
 		//for doubly linked list
 		// drawing.arrow(p.x2, p.y2, p.x1, p.y1, 4, "red");
+	}
 
+	//drawing nodes
+	nodes.forEach((circle, index) => {
 		drawing.circle(
-			circles[i].x,
-			circles[i].y,
-			circles[i].radius,
-			circles[i].data,
-			i === 0 ? "green" : "white"
+			circle.x,
+			circle.y,
+			circle.radius,
+			circle.data,
+			//head is green tail is blue, and rest are white
+			index === 0
+				? "green"
+				: index === nodes.length - 1
+				? "#33ccff"
+				: "white"
 		);
-		//drawing last circle
-		if (i === circles.length - 2) {
-			drawing.circle(
-				circles[i + 1].x,
-				circles[i + 1].y,
-				circles[i + 1].radius,
-				circles[i + 1].data,
-				"#33ccff" //blue color
+	});
+
+	if (addAnimStart) {
+		if (animation.animateCircle(newNode, 20)) {
+			//
+			const tail = nodes[nodes.length - 1];
+			const points = getPointsOnCircumfrence(
+				tail.x,
+				tail.y,
+				newNode.x,
+				newNode.y,
+				tail.radius
 			);
+			if (animation.animateLine(points, 20)) {
+				addAnimStart = false;
+				animation.reset();
+				nodes.push(newNode);
+			}
 		}
 	}
 
-	if (animStart) {
-		animFrms++;
-		// const ci = 10;
-		const tail = circles[circles.length - 1];
-		const p = getPointsOnCircumfrence(
-			tail.x,
-			tail.y,
-			newTail.x,
-			newTail.y,
-			tail.radius
-		);
-		const output = animation.animateCircle(newTail, p, 15, null);
-		//if return value is true, animation is completed
-		if (output) {
-			animStart = false;
-			animFrms = 0;
-			circles.push(newTail);
+	if (prependAnimStart) {
+		if (animation.animateCircle(newNode, 20)) {
+			//
+			const tail = nodes[0];
+			const points = getPointsOnCircumfrence(
+				newNode.x,
+				newNode.y,
+				tail.x,
+				tail.y,
+				tail.radius
+			);
+			if (animation.animateLine(points, 20)) {
+				prependAnimStart = false;
+				animation.reset();
+				nodes.unshift(newNode);
+			}
 		}
-
-		// drawing.circle(
-		// 	newTail.x,
-		// 	newTail.y,
-		// 	newTail.radius - 40,
-		// 	newTail.data,
-		// 	"white"
-		// );
-		// if (animFrms <= ci) {
-		// 	newTail.radius += 40 / ci;
-		// }
 	}
-
-	// if (animFrms >= ci + 2) {
-	// 	const tail = circles[circles.length - 1];
-	// 	const p = getPointsOnCircumfrence(
-	// 		tail.x,
-	// 		tail.y,
-	// 		newTail.x,
-	// 		newTail.y,
-	// 		tail.radius
-	// 	);
-	// 	const distX = p.x1 - p.x2;
-	// 	const distY = p.y1 - p.y2;
-
-	// 	drawing.arrow(p.x1, p.y1, p.x1 - cntx, p.y1 - cnty, 5, "blue");
-	// 	const speed = 20;
-	// 	cntx += distX / speed;
-	// 	cnty += distY / speed;
-
-	// 	console.log(cntx, cnty, distX, distY);
-
-	// 	//animation over
-	// 	if (
-	// 		Math.abs(cntx) >= Math.abs(distX) ||
-	// 		Math.abs(cnty) >= Math.abs(distY)
-	// 	) {
-	// 		cntx = 0;
-	// 		cnty = 0;
-	// 		animFrms = 0;
-	// 		circles.push(newTail);
-	// 		animStart = false;
-	// 	}
-	// 	}
-	// }
 
 	frames++;
-	//drawing circles
-	// circles.forEach(circle => {
+	//drawing nodes
+	// nodes.forEach(circle => {
 	//     drawing.circle(circle.x, circle.y, circle.radius, circle.data, circle.click === true ? "green" : "white");
 	// });
 }

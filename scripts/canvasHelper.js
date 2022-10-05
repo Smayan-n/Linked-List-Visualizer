@@ -96,7 +96,7 @@ class CanvasAnimation {
 		this.cnty = 0;
 	}
 
-	animateCircle(circle, points, animTime, nextAnimCallback) {
+	animateCircle(circle, animTime) {
 		//takes circle object
 		this.animFrms++;
 		this.canvas.circle(
@@ -117,11 +117,11 @@ class CanvasAnimation {
 			);
 			this.animFrms = 0;
 			this.circleRadOffset = 40;
-			return this.animateLine(points, animTime, null);
+			return true;
 		}
 	}
 
-	animateLine(points, animTime, nextAnimCallback) {
+	animateLine(points, animTime) {
 		this.animFrms++;
 
 		const distX = points.x1 - points.x2;
@@ -148,5 +148,12 @@ class CanvasAnimation {
 			this.circleRadOffset = 0;
 			return true;
 		}
+	}
+
+	reset() {
+		this.animFrms = 0;
+		this.circleRadOffset = 0;
+		this.cntx = 0;
+		this.cnty = 0;
 	}
 }
