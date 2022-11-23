@@ -83,6 +83,7 @@ class LinkedList {
 		return count;
 	}
 
+	//not used right now
 	getDrawableNodes() {
 		//returns array of nodes (circles) that can be drawn on the canvas
 		//also places nodes in proper positions (good (x, y) coords)

@@ -7,7 +7,7 @@ const simpleCanvas = new SimpleCanvas(ctx);
 const animator = new CanvasAnimation(simpleCanvas);
 const canvasObjHandler = new CanvasObjectHandler(simpleCanvas);
 
-//handle draging on nodes
+//handle dragging on nodes
 canvas.addEventListener("mousedown", (e) => {
 	canvasObjHandler.circles.forEach((circle) => {
 		//get x and y offsets on canvas
@@ -53,14 +53,14 @@ let animationObjects = [];
 const insertIndex = 1;
 $(".insert-btn").on("click", () => {
 	ll.insertAtIndex(40, insertIndex);
-	animationObjects = canvasObjHandler.getAnimationValues(ll, insertIndex);
+	animationObjects = canvasObjHandler.getAnimationObjects(ll, insertIndex);
 	newNode = animationObjects[0];
 	insertAnimStart = true;
 });
 
 $(".prepend-btn").on("click", () => {
 	ll.prepend(12);
-	animationObjects = canvasObjHandler.getAnimationValues(ll, 0);
+	animationObjects = canvasObjHandler.getAnimationObjects(ll, 0);
 	newNode = animationObjects[0];
 	newArrow = animationObjects[1];
 	prependAnimStart = true;
@@ -68,7 +68,10 @@ $(".prepend-btn").on("click", () => {
 
 $(".add-btn").on("click", () => {
 	ll.append(43);
-	animationObjects = canvasObjHandler.getAnimationValues(ll, ll.length() - 1);
+	animationObjects = canvasObjHandler.getAnimationObjects(
+		ll,
+		ll.length() - 1
+	);
 	newNode = animationObjects[0];
 	newArrow = animationObjects[1];
 	addAnimStart = true;
@@ -92,7 +95,7 @@ function draw() {
 		// if (animator.animateCircle(newNode, 20)) {
 		// 	//
 		// 	const oldNode = nodes[nodes.length - 1];
-		// 	const points = getPointsOnCircumfrence(
+		// 	const points = getPointsOnCircumference(
 		// 		oldNode.x,
 		// 		oldNode.y,
 		// 		newNode.x,
@@ -110,13 +113,17 @@ function draw() {
 			animator.animateCircle(newNode, animSpeed);
 		}
 		if (animFrames === animSpeed) {
-			canvasObjHandler.circles.push(newNode);
+			canvasObjHandler.tempCircles.push(newNode);
 		}
 		if (animFrames > animSpeed && animFrames < animSpeed * 2) {
 			animator.animateLine(newArrow, animSpeed);
 		}
-		if (animFrames > animSpeed * 2) {
+		if (animFrames > animSpeed * 2 && animFrames < animSpeed * 2.3) {
 			canvasObjHandler.arrows.push(newArrow);
+		}
+		if (animFrames > animSpeed * 2.3) {
+			canvasObjHandler.circles.push(newNode);
+			canvasObjHandler.tempCircles = [];
 			addAnimStart = false;
 			animator.reset();
 			animFrames = 0;
@@ -130,6 +137,7 @@ function draw() {
 			animator.animateCircle(newNode, animSpeed);
 		}
 		if (animFrames === animSpeed) {
+			//add node at position 0
 			canvasObjHandler.circles.unshift(newNode);
 		}
 		if (animFrames > animSpeed && animFrames < animSpeed * 2) {

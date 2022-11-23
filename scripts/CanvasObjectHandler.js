@@ -4,6 +4,7 @@ class CanvasObjectHandler {
 		//takes in a SimpleCanvas object
 		this.sc = simpleCanvas;
 		this.circles = []; //each circle => {x, y, radius, data, color}
+		this.tempCircles = []; //stores circles that are currently being animated
 		this.arrows = []; //each arrow => {x1, y1, x2, y2, width, color}
 	}
 
@@ -27,6 +28,8 @@ class CanvasObjectHandler {
 				circle.y,
 				circle.radius,
 				circle.data,
+				// circle.color
+				//head is green and tail is aqua
 				index === 0
 					? "green"
 					: index === this.circles.length - 1
@@ -34,12 +37,25 @@ class CanvasObjectHandler {
 					: "white"
 			);
 		});
+
+		//drawing circles that are being animated
+		this.tempCircles.forEach((circle) => {
+			this.sc.circle(
+				circle.x,
+				circle.y,
+				circle.radius,
+				circle.data,
+				circle.color
+			);
+		});
 	}
 
+	//generates a list of all arrows connecting the nodes
 	generateArrows() {
 		const arrows = [];
 		for (let i = 0; i < this.circles.length - 1; i++) {
-			const p = getPointsOnCircumfrence(
+			//get points on the circumference of the circle and not the center
+			const p = getPointsOnCircumference(
 				this.circles[i].x,
 				this.circles[i].y,
 				this.circles[i + 1].x,
@@ -60,16 +76,16 @@ class CanvasObjectHandler {
 		this.arrows = arrows;
 	}
 
+	//calculates array of nodes (circles) that can be drawn on the canvas
+	//also places the circles in proper positions (good (x, y) coords)
 	generateCircles(ll) {
-		//calculates array of nodes (circles) that can be drawn on the canvas
-		//also places the circles in proper positions (good (x, y) coords)
-
 		const nodes = [];
 		let curr = ll.head;
 
 		let x = 75;
 		let y = 75;
 		let flag = true;
+		let index = 0;
 		//traversing through linked list
 		while (curr) {
 			nodes.push({
@@ -91,12 +107,14 @@ class CanvasObjectHandler {
 			}
 
 			curr = curr.next;
+			index++;
 		}
 
 		this.circles = nodes;
 	}
 
-	getAnimationValues(ll, index) {
+	//returns a list of circles and arrows that have to be animated
+	getAnimationObjects(ll, index) {
 		//ll is the linked list
 		//index is of the node that is added
 

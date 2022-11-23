@@ -1,4 +1,4 @@
-function getPointsOnCircumfrence(x1, y1, x2, y2, dt) {
+function getPointsOnCircumference(x1, y1, x2, y2, dt) {
 	//returns x, y coords on given line dt distance from x1, y1 and also x2, y2 (returns 2 coords)
 
 	const d = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));

@@ -5,6 +5,7 @@ class SimpleCanvas {
 		this.ctx = canvasContext;
 	}
 
+	//draws circle
 	circle(x, y, radius, text = "", color = "white") {
 		this.ctx.fillStyle = color;
 		this.ctx.strokeStyle = color;
@@ -35,9 +36,8 @@ class SimpleCanvas {
 		this.ctx.closePath();
 	}
 
+	//draws an arrow from (fromx, fromy) to (tox, toy)
 	arrow(fromx, fromy, tox, toy, arrowWidth, color) {
-		//draws an arrow from (fromx, fromy) to (tox, toy)
-
 		//variables to be used when creating the arrow
 		var headlen = 10;
 		var angle = Math.atan2(toy - fromy, tox - fromx);
@@ -100,6 +100,7 @@ class CanvasAnimation {
 
 	animateCircle(circle, animTime) {
 		//takes circle object
+		//WARNING: 40 is a hardcoded value - might cause problems
 		this.animFrms++;
 		this.canvas.circle(
 			circle.x,
