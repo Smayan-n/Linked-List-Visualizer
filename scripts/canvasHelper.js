@@ -75,6 +75,23 @@ class SimpleCanvas {
 		this.ctx.stroke();
 	}
 
+	rect(x, y, width, height, text = "", color = "white") {
+		this.ctx.beginPath();
+		this.ctx.fillStyle = color;
+		this.ctx.strokeStyle = color;
+		this.ctx.roundRect(x, y, width, height, 5);
+		this.ctx.stroke();
+		this.ctx.fill();
+
+		this.ctx.font = "bold 24px Arial";
+		//center text
+		this.ctx.textAlign = "center";
+		this.ctx.textBaseLine = "middle";
+		this.ctx.fillStyle = "red";
+		this.ctx.fillText(text, width / 2 + x, height / 2 + y + 8);
+		this.ctx.closePath();
+	}
+
 	//takes animation callback function and refreshes the canvas
 	refresh(callbackFunction) {
 		const canvas = this.ctx.canvas;
@@ -90,12 +107,11 @@ class CanvasAnimation {
 		//takes in a SimpleCanvas object
 		this.canvas = simpleCanvas;
 		this.animFrms = 0;
+
 		this.circleRadOffset = 0;
 
 		this.cntx = 0;
 		this.cnty = 0;
-		this.cntx2 = 0;
-		this.cnty2 = 0;
 	}
 
 	animateCircle(circle, animTime) {
@@ -118,12 +134,12 @@ class CanvasAnimation {
 				circle.data,
 				"white"
 			);
-			this.animFrms = 0;
-			this.circleRadOffset = 0;
+			//end animation
 			return true;
 		}
 	}
 
+	//takes in an arrow and uses it's x1, y1 and x2, y2 to animate the arrow growing from one coord to another
 	animateLine(points, animTime) {
 		this.animFrms++;
 
@@ -145,36 +161,34 @@ class CanvasAnimation {
 			Math.abs(this.cntx) >= Math.abs(distX) ||
 			Math.abs(this.cnty) >= Math.abs(distY)
 		) {
-			this.cntx = 0;
-			this.cnty = 0;
-			this.animFrms = 0;
+			//end animation
 			return true;
 		}
 	}
 
-	animateMoveLine(points, animTime) {
+	animateMoveLine(points, endCoord, animTime) {
 		this.animFrms++;
 
-		const distX = points.x1 - points.x2;
-		const distY = points.y1 - points.y2;
+		const distX = points.x1 - endCoord.x;
+		const distY = points.y1 - endCoord.y;
 
 		this.canvas.arrow(
 			points.x1,
 			points.y1,
-			points.x1 - this.cntx2,
-			points.y1 - this.cnty2,
+			points.x2 - this.cntx,
+			points.y2 - this.cnty,
 			5,
 			"blue"
 		);
-		this.cntx2 += distX / animTime;
-		this.cnty2 += distY / animTime;
+		this.cntx += distX / animTime;
+		this.cnty += distY / animTime;
 
 		if (
-			Math.abs(this.cntx2) >= Math.abs(distX) ||
-			Math.abs(this.cnty2) >= Math.abs(distY)
+			Math.abs(this.cntx) >= Math.abs(distX) ||
+			Math.abs(this.cnty) >= Math.abs(distY)
 		) {
-			this.cntx2 = 0;
-			this.cnty2 = 0;
+			this.cntx = 0;
+			this.cnty = 0;
 			this.animFrms = 0;
 			return true;
 		}
@@ -185,7 +199,5 @@ class CanvasAnimation {
 		this.circleRadOffset = 0;
 		this.cntx = 0;
 		this.cnty = 0;
-		this.cntx2 = 0;
-		this.cnty2 = 0;
 	}
 }

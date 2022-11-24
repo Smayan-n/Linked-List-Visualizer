@@ -5,7 +5,10 @@ class CanvasObjectHandler {
 		this.sc = simpleCanvas;
 		this.circles = []; //each circle => {x, y, radius, data, color}
 		this.tempCircles = []; //stores circles that are currently being animated
-		this.arrows = []; //each arrow => {x1, y1, x2, y2, width, color}
+
+		this.arrows = []; //each arrow => {x1, y1, x2, y2, width, color} (each arrow connects 2 centers of circles)
+
+		this.labels = []; //head and tail labels
 	}
 
 	drawArrows() {
@@ -28,7 +31,11 @@ class CanvasObjectHandler {
 				circle.y,
 				circle.radius,
 				circle.data,
-				// circle.color
+				// index === 0
+				// 	? circle.data + "(head)"
+				// 	: index === this.circles.length - 1
+				// 	? circle.data + "(tail)"
+				// 	: circle.data,
 				//head is green and tail is aqua
 				index === 0
 					? "green"
@@ -36,6 +43,28 @@ class CanvasObjectHandler {
 					? "aqua"
 					: "white"
 			);
+
+			//draw head and tail labels on nodes
+			if (index === 0) {
+				this.sc.rect(
+					circle.x - circle.radius + 15,
+					circle.y + circle.radius + 10,
+					70,
+					30,
+					"Head",
+					"white"
+				);
+			}
+			if (index === this.circles.length - 1) {
+				this.sc.rect(
+					circle.x - circle.radius + 15,
+					circle.y + circle.radius + 10,
+					70,
+					30,
+					"Tail",
+					"white"
+				);
+			}
 		});
 
 		//drawing circles that are being animated
@@ -114,6 +143,7 @@ class CanvasObjectHandler {
 	}
 
 	//returns a list of circles and arrows that have to be animated
+	//NOTE: CAN BE OPTIMIZED BY - LOOK AT MAIN FILE
 	getAnimationObjects(ll, index) {
 		//ll is the linked list
 		//index is of the node that is added
