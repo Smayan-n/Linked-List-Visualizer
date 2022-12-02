@@ -39,7 +39,7 @@ canvas.addEventListener("mousedown", (e) => {
 	});
 });
 
-const ll = new LinkedList([1, 2]);
+const ll = new LinkedList([1, 2, 5, 8, 9]);
 canvasObjHandler.generateCircles(ll);
 canvasObjHandler.generateArrows();
 // let nodes = canvasObjHandler.circles;
@@ -50,15 +50,24 @@ let newNode = null;
 let newArrow = null;
 let animationObjects = [];
 
-const insertIndex = 1;
+const insertIndex = 3;
 let leftArrow = null;
+let rightArrow = null;
 $(".insert-btn").on("click", () => {
 	leftArrow = canvasObjHandler.arrows[insertIndex - 1];
-	console.log(leftArrow);
 	// ll.insertAtIndex(40, insertIndex);
 	// animationObjects = canvasObjHandler.getAnimationObjects(ll, insertIndex);
 	// newNode = animationObjects[0];
-	newNode = { x: 200, y: 200, radius: 50, data: 40, color: "white" };
+	newNode = { x: 400, y: 400, radius: 50, data: 40, color: "white" };
+	rightArrow = {
+		index: insertIndex,
+		x1: newNode.x,
+		y1: newNode.y,
+		x2: canvasObjHandler.circles[insertIndex].x,
+		y2: canvasObjHandler.circles[insertIndex].y,
+		width: 5,
+		color: "red",
+	};
 	insertAnimStart = true;
 });
 
@@ -90,10 +99,6 @@ draw();
 function draw() {
 	//refresh canvas and get new animation frame
 	simpleCanvas.refresh(draw);
-
-	//drawing objects
-	canvasObjHandler.drawArrows();
-	canvasObjHandler.drawCircles();
 
 	if (addAnimStart) {
 		animFrames++;
@@ -149,57 +154,53 @@ function draw() {
 
 	if (insertAnimStart) {
 		animFrames++;
-		animator.animateMoveLine(
-			{ x1: 0, y1: 0, x2: 100, y2: 0 },
-			{ x: 400, y: 400 },
-			animSpeed
-		);
-		if (animFrames > animSpeed) {
-			insertAnimStart = false;
-			animFrames = 0;
-			animator.reset();
-		}
 
 		// const leftArrow = animationObjects[1];
 		// const rightArrow = animationObjects[2];
-		// 	const rightArrow = {
-		// 		index: 1,
-		// 		x1: newNode.x,
-		// 		y1: newNode.x,
-		// 		x2: canvasObjHandler.circles[canvasObjHandler.circles.length - 1].x,
-		// 		y2: canvasObjHandler.circles[canvasObjHandler.circles.length - 1].y,
-		// 		width: 5,
-		// 		color: "red",
-		// 	};
 
-		// 	if (animFrames < animSpeed) {
-		// 		animator.animateCircle(newNode, animSpeed);
-		// 	}
-		// 	if (animFrames === animSpeed) {
-		// 		canvasObjHandler.circles.splice(insertIndex, 0, newNode);
-		// 	}
-		// 	if (animFrames >= animSpeed && animFrames < animSpeed * 2) {
-		// 		// animator.animateLine(leftArrow, animSpeed);
-		// 		animator.animateMoveLine(
-		// 			leftArrow,
-		// 			{ x: newNode.x, y: newNode.y },
-		// 			animSpeed
-		// 		);
-		// 	}
-		// 	if (animFrames === animSpeed * 2) {
-		// 		animator.reset(); //to avoid any weird line drawing
-		// 		canvasObjHandler.arrows.splice(insertIndex - 1, 0, leftArrow);
-		// 	}
-		// 	if (animFrames >= animSpeed * 2 && animFrames < animSpeed * 3) {
-		// 		animator.animateLine(rightArrow, animSpeed);
-		// 	}
-		// 	if (animFrames === animSpeed * 3) {
-		// 		canvasObjHandler.arrows.splice(insertIndex, 0, rightArrow);
-		// 	}
-		// 	if (animFrames > animSpeed * 3) {
-		// 		insertAnimStart = false;
-		// 		animFrames = 0;
-		// 		animator.reset();
-		// 	}
+		if (animFrames < animSpeed) {
+			animator.animateCircle(newNode, animSpeed);
+		}
+		if (animFrames === animSpeed) {
+			canvasObjHandler.circles.splice(insertIndex, 0, newNode);
+			canvasObjHandler.arrows.splice(insertIndex - 1, 1); //delete existing arrow
+		}
+		if (animFrames >= animSpeed && animFrames < animSpeed * 2) {
+			// animator.animateLine(leftArrow, animSpeed);
+			animator.animateMoveLine(
+				leftArrow,
+				{ x: newNode.x, y: newNode.y },
+				animSpeed
+			);
+		}
+		if (animFrames === animSpeed * 2) {
+			animator.reset(); //to avoid any weird line drawing
+			leftArrow = {
+				index: insertIndex - 1,
+				x1: leftArrow.x1,
+				y1: leftArrow.y1,
+				x2: newNode.x,
+				y2: newNode.y,
+				width: 5,
+				color: "red",
+			};
+			canvasObjHandler.arrows.splice(insertIndex - 1, 0, leftArrow);
+		}
+		if (animFrames >= animSpeed * 2 && animFrames < animSpeed * 3) {
+			animator.animateLine(rightArrow, animSpeed);
+		}
+		if (animFrames === animSpeed * 3) {
+			canvasObjHandler.arrows.splice(insertIndex, 0, rightArrow);
+		}
+		if (animFrames > animSpeed * 3) {
+			insertAnimStart = false;
+			animFrames = 0;
+			animator.reset();
+			ll.insertAtIndex(40, insertIndex);
+		}
 	}
+
+	//drawing objects
+	canvasObjHandler.drawArrows();
+	canvasObjHandler.drawCircles();
 }

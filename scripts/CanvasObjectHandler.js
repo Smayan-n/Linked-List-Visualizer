@@ -9,18 +9,21 @@ class CanvasObjectHandler {
 		this.arrows = []; //each arrow => {x1, y1, x2, y2, width, color} (each arrow connects 2 centers of circles)
 
 		this.labels = []; //head and tail labels
+
+		this.circleRadius = 50;
 	}
 
 	drawArrows() {
 		this.arrows.forEach((arrow) => {
-			this.sc.arrow(
+			//get points on the circumference of the circle and not the center
+			const p = getPointsOnCircumference(
 				arrow.x1,
 				arrow.y1,
 				arrow.x2,
 				arrow.y2,
-				arrow.width,
-				arrow.color
+				this.circleRadius
 			);
+			this.sc.arrow(p.x1, p.y1, p.x2, p.y2, arrow.width, arrow.color);
 		});
 	}
 
@@ -83,21 +86,12 @@ class CanvasObjectHandler {
 	generateArrows() {
 		const arrows = [];
 		for (let i = 0; i < this.circles.length - 1; i++) {
-			//get points on the circumference of the circle and not the center
-			const p = getPointsOnCircumference(
-				this.circles[i].x,
-				this.circles[i].y,
-				this.circles[i + 1].x,
-				this.circles[i + 1].y,
-				this.circles[i + 1].radius
-			);
-
 			arrows.push({
 				index: i,
-				x1: p.x1,
-				y1: p.y1,
-				x2: p.x2,
-				y2: p.y2,
+				x1: this.circles[i].x,
+				y1: this.circles[i].y,
+				x2: this.circles[i + 1].x,
+				y2: this.circles[i + 1].y,
 				width: 5,
 				color: "red",
 			});

@@ -169,8 +169,8 @@ class CanvasAnimation {
 	animateMoveLine(points, endCoord, animTime) {
 		this.animFrms++;
 
-		const distX = points.x1 - endCoord.x;
-		const distY = points.y1 - endCoord.y;
+		const distX = points.x2 - endCoord.x;
+		const distY = points.y2 - endCoord.y;
 
 		this.canvas.arrow(
 			points.x1,
@@ -182,6 +182,7 @@ class CanvasAnimation {
 		);
 		this.cntx += distX / animTime;
 		this.cnty += distY / animTime;
+		// console.log(distX, distY, "    ", this.cntx, this.cnty);
 
 		if (
 			Math.abs(this.cntx) >= Math.abs(distX) ||
