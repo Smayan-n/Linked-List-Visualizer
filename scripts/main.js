@@ -39,10 +39,11 @@ canvas.addEventListener("mousedown", (e) => {
 	});
 });
 
-const ll = new LinkedList([1, 2, 5, 8, 9]);
+const ll = new LinkedList([1, 2]);
+
 canvasObjHandler.generateCircles(ll);
 canvasObjHandler.generateArrows();
-// let nodes = canvasObjHandler.circles;
+
 let addAnimStart = false;
 let prependAnimStart = false;
 let insertAnimStart = false;
@@ -50,44 +51,96 @@ let newNode = null;
 let newArrow = null;
 let animationObjects = [];
 
-const insertIndex = 3;
+let insertIndex = null;
 let leftArrow = null;
 let rightArrow = null;
 $(".insert-btn").on("click", () => {
-	leftArrow = canvasObjHandler.arrows[insertIndex - 1];
-	// ll.insertAtIndex(40, insertIndex);
-	// animationObjects = canvasObjHandler.getAnimationObjects(ll, insertIndex);
-	// newNode = animationObjects[0];
-	newNode = { x: 400, y: 400, radius: 50, data: 40, color: "white" };
-	rightArrow = {
-		index: insertIndex,
-		x1: newNode.x,
-		y1: newNode.y,
-		x2: canvasObjHandler.circles[insertIndex].x,
-		y2: canvasObjHandler.circles[insertIndex].y,
-		width: 5,
-		color: "red",
+	$("canvas").css("cursor", "crosshair");
+
+	canvas.onclick = (e) => {
+		insertIndex = $(".pos-input").val();
+		newNode = {
+			x: e.offsetX,
+			y: e.offsetY,
+			radius: 50,
+			data: $(".data-input").val(),
+			color: "white",
+		};
+		leftArrow = canvasObjHandler.arrows[insertIndex - 1];
+		rightArrow = {
+			index: insertIndex,
+			x1: newNode.x,
+			y1: newNode.y,
+			x2: canvasObjHandler.circles[insertIndex].x,
+			y2: canvasObjHandler.circles[insertIndex].y,
+			width: 5,
+			color: "red",
+		};
+		insertAnimStart = true;
+		canvas.onclick = null;
+		$("canvas").css("cursor", "default");
 	};
-	insertAnimStart = true;
 });
 
 $(".prepend-btn").on("click", () => {
-	ll.prepend(12);
-	animationObjects = canvasObjHandler.getAnimationObjects(ll, 0);
-	newNode = animationObjects[0];
-	newArrow = animationObjects[1];
-	prependAnimStart = true;
+	$("canvas").css("cursor", "crosshair");
+	canvas.onclick = (e) => {
+		newNode = {
+			x: e.offsetX,
+			y: e.offsetY,
+			radius: 50,
+			data: $(".data-input").val(),
+			color: "white",
+		};
+		newArrow = {
+			index: canvasObjHandler.arrows.length,
+			x1: newNode.x,
+			y1: newNode.y,
+			x2: canvasObjHandler.circles[0].x,
+			y2: canvasObjHandler.circles[0].y,
+			width: 5,
+			color: "red",
+		};
+		ll.prepend(12);
+		prependAnimStart = true;
+		canvas.onclick = null;
+		$("canvas").css("cursor", "default");
+	};
+	// animationObjects = canvasObjHandler.getAnimationObjects(ll, 0);
+	// newNode = animationObjects[0];
+	// newArrow = animationObjects[1];
 });
 
 $(".add-btn").on("click", () => {
-	ll.append(43);
-	animationObjects = canvasObjHandler.getAnimationObjects(
-		ll,
-		ll.length() - 1
-	);
-	newNode = animationObjects[0];
-	newArrow = animationObjects[1];
-	addAnimStart = true;
+	$("canvas").css("cursor", "crosshair");
+	canvas.onclick = (e) => {
+		newNode = {
+			x: e.offsetX,
+			y: e.offsetY,
+			radius: 50,
+			data: $(".data-input").val(),
+			color: "white",
+		};
+		newArrow = {
+			index: canvasObjHandler.arrows.length,
+			x1: canvasObjHandler.circles[canvasObjHandler.circles.length - 1].x,
+			y1: canvasObjHandler.circles[canvasObjHandler.circles.length - 1].y,
+			x2: newNode.x,
+			y2: newNode.y,
+			width: 5,
+			color: "red",
+		};
+		ll.append(12);
+		addAnimStart = true;
+		canvas.onclick = null;
+		$("canvas").css("cursor", "default");
+	};
+	// animationObjects = canvasObjHandler.getAnimationObjects(
+	// 	ll,
+	// 	ll.length() - 1
+	// );
+	// newNode = animationObjects[0];
+	// newArrow = animationObjects[1];
 });
 
 let animFrames = 0;
@@ -99,6 +152,8 @@ draw();
 function draw() {
 	//refresh canvas and get new animation frame
 	simpleCanvas.refresh(draw);
+
+	//animation sequences
 
 	if (addAnimStart) {
 		animFrames++;
@@ -112,7 +167,7 @@ function draw() {
 		if (animFrames > animSpeed && animFrames < animSpeed * 2) {
 			animator.animateLine(newArrow, animSpeed);
 		}
-		if (animFrames > animSpeed * 2 && animFrames < animSpeed * 2.1) {
+		if (animFrames === animSpeed * 2) {
 			canvasObjHandler.arrows.push(newArrow);
 		}
 		if (animFrames > animSpeed * 2.1) {
@@ -138,7 +193,7 @@ function draw() {
 		if (animFrames > animSpeed && animFrames < animSpeed * 2) {
 			animator.animateLine(newArrow, animSpeed);
 		}
-		if (animFrames > animSpeed * 2 && animFrames < animSpeed * 2.1) {
+		if (animFrames === animSpeed * 2) {
 			canvasObjHandler.arrows.unshift(newArrow);
 		}
 		if (animFrames > animSpeed * 2.1) {
@@ -155,9 +210,6 @@ function draw() {
 	if (insertAnimStart) {
 		animFrames++;
 
-		// const leftArrow = animationObjects[1];
-		// const rightArrow = animationObjects[2];
-
 		if (animFrames < animSpeed) {
 			animator.animateCircle(newNode, animSpeed);
 		}
@@ -166,7 +218,7 @@ function draw() {
 			canvasObjHandler.arrows.splice(insertIndex - 1, 1); //delete existing arrow
 		}
 		if (animFrames >= animSpeed && animFrames < animSpeed * 2) {
-			// animator.animateLine(leftArrow, animSpeed);
+			//animate left arrow moving to new node
 			animator.animateMoveLine(
 				leftArrow,
 				{ x: newNode.x, y: newNode.y },
@@ -175,15 +227,10 @@ function draw() {
 		}
 		if (animFrames === animSpeed * 2) {
 			animator.reset(); //to avoid any weird line drawing
-			leftArrow = {
-				index: insertIndex - 1,
-				x1: leftArrow.x1,
-				y1: leftArrow.y1,
-				x2: newNode.x,
-				y2: newNode.y,
-				width: 5,
-				color: "red",
-			};
+			//left arrow's end points are now changed
+			leftArrow.x2 = newNode.x;
+			leftArrow.y2 = newNode.y;
+			//left arrow is added to main list so it can be drawn
 			canvasObjHandler.arrows.splice(insertIndex - 1, 0, leftArrow);
 		}
 		if (animFrames >= animSpeed * 2 && animFrames < animSpeed * 3) {
@@ -193,9 +240,10 @@ function draw() {
 			canvasObjHandler.arrows.splice(insertIndex, 0, rightArrow);
 		}
 		if (animFrames > animSpeed * 3) {
+			animator.reset();
 			insertAnimStart = false;
 			animFrames = 0;
-			animator.reset();
+			//update actual linked list
 			ll.insertAtIndex(40, insertIndex);
 		}
 	}
@@ -203,4 +251,5 @@ function draw() {
 	//drawing objects
 	canvasObjHandler.drawArrows();
 	canvasObjHandler.drawCircles();
+	// console.log(canvasObjHandler.arrows);
 }

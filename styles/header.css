@@ -36,5 +36,10 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
+
+}
+
+.data-input, .pos-input{
+    width: 60px;
 }

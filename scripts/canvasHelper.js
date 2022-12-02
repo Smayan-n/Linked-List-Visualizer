@@ -75,11 +75,11 @@ class SimpleCanvas {
 		this.ctx.stroke();
 	}
 
-	rect(x, y, width, height, text = "", color = "white") {
+	rect(x, y, width, height, radius, text = "", color = "white") {
 		this.ctx.beginPath();
 		this.ctx.fillStyle = color;
 		this.ctx.strokeStyle = color;
-		this.ctx.roundRect(x, y, width, height, 5);
+		this.ctx.roundRect(x, y, width, height, radius);
 		this.ctx.stroke();
 		this.ctx.fill();
 
@@ -106,18 +106,17 @@ class CanvasAnimation {
 	constructor(simpleCanvas) {
 		//takes in a SimpleCanvas object
 		this.canvas = simpleCanvas;
-		this.animFrms = 0;
 
 		this.circleRadOffset = 0;
 
-		this.cntx = 0;
-		this.cnty = 0;
+		this.offsetx = 0;
+		this.offsety = 0;
 	}
 
 	animateCircle(circle, animTime) {
 		//takes circle object
 		//WARNING: 40 is a hardcoded value - might cause problems
-		this.animFrms++;
+
 		this.canvas.circle(
 			circle.x,
 			circle.y,
@@ -125,7 +124,9 @@ class CanvasAnimation {
 			circle.data,
 			"white"
 		);
+
 		this.circleRadOffset += 40 / animTime;
+
 		if (this.circleRadOffset >= 40) {
 			this.canvas.circle(
 				circle.x,
@@ -141,64 +142,59 @@ class CanvasAnimation {
 
 	//takes in an arrow and uses it's x1, y1 and x2, y2 to animate the arrow growing from one coord to another
 	animateLine(points, animTime) {
-		this.animFrms++;
-
 		const distX = points.x1 - points.x2;
 		const distY = points.y1 - points.y2;
 
 		this.canvas.arrow(
 			points.x1,
 			points.y1,
-			points.x1 - this.cntx,
-			points.y1 - this.cnty,
+			points.x1 - this.offsetx,
+			points.y1 - this.offsety,
 			5,
 			"blue"
 		);
-		this.cntx += distX / animTime;
-		this.cnty += distY / animTime;
+		this.offsetx += distX / animTime;
+		this.offsety += distY / animTime;
 
 		if (
-			Math.abs(this.cntx) >= Math.abs(distX) ||
-			Math.abs(this.cnty) >= Math.abs(distY)
+			Math.abs(this.offsetx) >= Math.abs(distX) ||
+			Math.abs(this.offsety) >= Math.abs(distY)
 		) {
 			//end animation
 			return true;
 		}
 	}
 
+	//animates arrow moving to endcoord
 	animateMoveLine(points, endCoord, animTime) {
-		this.animFrms++;
-
+		//separate distances between end of arrow and new node coords (where the arrow will end up)
 		const distX = points.x2 - endCoord.x;
 		const distY = points.y2 - endCoord.y;
 
 		this.canvas.arrow(
 			points.x1,
 			points.y1,
-			points.x2 - this.cntx,
-			points.y2 - this.cnty,
+			points.x2 - this.offsetx,
+			points.y2 - this.offsety,
 			5,
 			"blue"
 		);
-		this.cntx += distX / animTime;
-		this.cnty += distY / animTime;
-		// console.log(distX, distY, "    ", this.cntx, this.cnty);
+		//slowly adding fractions to offset
+		this.offsetx += distX / animTime;
+		this.offsety += distY / animTime;
 
+		//animation complete when offset is equal to distance
 		if (
-			Math.abs(this.cntx) >= Math.abs(distX) ||
-			Math.abs(this.cnty) >= Math.abs(distY)
+			Math.abs(this.offsetx) >= Math.abs(distX) ||
+			Math.abs(this.offsety) >= Math.abs(distY)
 		) {
-			this.cntx = 0;
-			this.cnty = 0;
-			this.animFrms = 0;
 			return true;
 		}
 	}
 
 	reset() {
-		this.animFrms = 0;
 		this.circleRadOffset = 0;
-		this.cntx = 0;
-		this.cnty = 0;
+		this.offsetx = 0;
+		this.offsety = 0;
 	}
 }

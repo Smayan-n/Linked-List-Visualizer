@@ -72,6 +72,32 @@ class LinkedList {
 		this.head = node;
 	}
 
+	deleteAtIndex(index) {
+		//delete node at index
+		if (!this.head) {
+			return;
+		}
+		if (index === 0) {
+			this.head = this.head.next;
+			this.head.prev = null;
+			return;
+		}
+
+		let curr = this.head;
+		let currIndex = 0;
+		while (curr) {
+			if (currIndex === index) {
+				curr.prev.next = curr.next;
+				if (curr.next) {
+					curr.next.prev = curr.prev;
+				}
+				return;
+			}
+			currIndex++;
+			curr = curr.next;
+		}
+	}
+
 	length() {
 		//return length of linked list
 		let curr = this.head;
@@ -81,6 +107,16 @@ class LinkedList {
 			curr = curr.next;
 		}
 		return count;
+	}
+
+	toString() {
+		let curr = this.head;
+		let str = "";
+		while (curr) {
+			str += curr.data + " ";
+			curr = curr.next;
+		}
+		return str;
 	}
 
 	//not used right now

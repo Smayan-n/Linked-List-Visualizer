@@ -9,8 +9,6 @@ class CanvasObjectHandler {
 		this.arrows = []; //each arrow => {x1, y1, x2, y2, width, color} (each arrow connects 2 centers of circles)
 
 		this.labels = []; //head and tail labels
-
-		this.circleRadius = 50;
 	}
 
 	drawArrows() {
@@ -21,7 +19,7 @@ class CanvasObjectHandler {
 				arrow.y1,
 				arrow.x2,
 				arrow.y2,
-				this.circleRadius
+				this.circles[0].radius //getting radius of one circle (all circles have same radius)
 			);
 			this.sc.arrow(p.x1, p.y1, p.x2, p.y2, arrow.width, arrow.color);
 		});
@@ -34,43 +32,43 @@ class CanvasObjectHandler {
 				circle.y,
 				circle.radius,
 				circle.data,
-				// index === 0
-				// 	? circle.data + "(head)"
-				// 	: index === this.circles.length - 1
-				// 	? circle.data + "(tail)"
-				// 	: circle.data,
 				//head is green and tail is aqua
 				index === 0
 					? "green"
 					: index === this.circles.length - 1
 					? "aqua"
-					: "white"
+					: circle.color
 			);
 
 			//draw head and tail labels on nodes
-			if (index === 0) {
-				this.sc.rect(
-					circle.x - circle.radius + 15,
-					circle.y + circle.radius + 10,
-					70,
-					30,
-					"Head",
-					"white"
-				);
-			}
+			//tail label
 			if (index === this.circles.length - 1) {
 				this.sc.rect(
 					circle.x - circle.radius + 15,
 					circle.y + circle.radius + 10,
 					70,
 					30,
+					5,
 					"Tail",
+					"white"
+				);
+			}
+			//head label
+			if (index === 0) {
+				this.sc.rect(
+					circle.x - circle.radius + 15,
+					circle.y + circle.radius + 10,
+					70,
+					30,
+					5,
+					"Head",
 					"white"
 				);
 			}
 		});
 
-		//drawing circles that are being animated
+		//drawing temporary circles that are being animated
+		//temporary circles are needed so there are no color coding problems caused (head and tail have colors)
 		this.tempCircles.forEach((circle) => {
 			this.sc.circle(
 				circle.x,
@@ -137,7 +135,7 @@ class CanvasObjectHandler {
 	}
 
 	//returns a list of circles and arrows that have to be animated
-	//NOTE: CAN BE OPTIMIZED BY - LOOK AT MAIN FILE
+	//NOTE: CAN BE OPTIMIZED - LOOK AT MAIN FILE
 	getAnimationObjects(ll, index) {
 		//ll is the linked list
 		//index is of the node that is added
