@@ -113,14 +113,16 @@ class CanvasAnimation {
 		this.offsety = 0;
 	}
 
-	animateCircle(circle, animTime) {
+	animateCircle(circle, animTime, reversed = false) {
 		//takes circle object
 		//WARNING: 40 is a hardcoded value - might cause problems
 
 		this.canvas.circle(
 			circle.x,
 			circle.y,
-			circle.radius - 40 + this.circleRadOffset,
+			reversed
+				? circle.radius - this.circleRadOffset
+				: circle.radius - 40 + this.circleRadOffset,
 			circle.data,
 			"white"
 		);
@@ -141,18 +143,40 @@ class CanvasAnimation {
 	}
 
 	//takes in an arrow and uses it's x1, y1 and x2, y2 to animate the arrow growing from one coord to another
-	animateLine(points, animTime) {
+	animateLine(points, animTime, collapse = false, reversed = false) {
+		//collapse is opposite of arrow expanding
+		//collapse reverse means arrow collapses from tail to head and collapse not reversed means arrow collapses from head to tail
+
 		const distX = points.x1 - points.x2;
 		const distY = points.y1 - points.y2;
 
-		this.canvas.arrow(
-			points.x1,
-			points.y1,
-			points.x1 - this.offsetx,
-			points.y1 - this.offsety,
-			5,
-			"blue"
-		);
+		collapse
+			? reversed
+				? this.canvas.arrow(
+						points.x1 - this.offsetx,
+						points.y1 - this.offsety,
+						points.x2,
+						points.y2,
+						5,
+						"blue"
+				  )
+				: this.canvas.arrow(
+						points.x1,
+						points.y1,
+						points.x2 + this.offsetx,
+						points.y2 + this.offsety,
+						5,
+						"blue"
+				  )
+			: this.canvas.arrow(
+					points.x1,
+					points.y1,
+					points.x1 - this.offsetx,
+					points.y1 - this.offsety,
+					5,
+					"blue"
+			  );
+
 		this.offsetx += distX / animTime;
 		this.offsety += distY / animTime;
 

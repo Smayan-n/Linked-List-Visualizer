@@ -82,6 +82,11 @@ class LinkedList {
 			this.head.prev = null;
 			return;
 		}
+		if (index === this.length() - 1) {
+			this.tail = this.tail.prev;
+			this.tail.next = null;
+			return;
+		}
 
 		let curr = this.head;
 		let currIndex = 0;

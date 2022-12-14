@@ -3,7 +3,7 @@ class CanvasObjectHandler {
 	constructor(simpleCanvas) {
 		//takes in a SimpleCanvas object
 		this.sc = simpleCanvas;
-		this.circles = []; //each circle => {x, y, radius, data, color}
+		this.circles = []; //each circle => {x, y, radius, data, color, visible}
 		this.tempCircles = []; //stores circles that are currently being animated
 
 		this.arrows = []; //each arrow => {x1, y1, x2, y2, width, color} (each arrow connects 2 centers of circles)
@@ -27,43 +27,44 @@ class CanvasObjectHandler {
 
 	drawCircles() {
 		this.circles.forEach((circle, index) => {
-			this.sc.circle(
-				circle.x,
-				circle.y,
-				circle.radius,
-				circle.data,
-				//head is green and tail is aqua
-				index === 0
-					? "green"
-					: index === this.circles.length - 1
-					? "aqua"
-					: circle.color
-			);
-
-			//draw head and tail labels on nodes
-			//tail label
-			if (index === this.circles.length - 1) {
-				this.sc.rect(
-					circle.x - circle.radius + 15,
-					circle.y + circle.radius + 10,
-					70,
-					30,
-					5,
-					"Tail",
-					"white"
+			if (circle.visible) {
+				this.sc.circle(
+					circle.x,
+					circle.y,
+					circle.radius,
+					circle.data,
+					//head is green and tail is aqua
+					index === 0
+						? "green"
+						: index === this.circles.length - 1
+						? "aqua"
+						: circle.color
 				);
-			}
-			//head label
-			if (index === 0) {
-				this.sc.rect(
-					circle.x - circle.radius + 15,
-					circle.y + circle.radius + 10,
-					70,
-					30,
-					5,
-					"Head",
-					"white"
-				);
+				//draw head and tail labels on nodes
+				//tail label
+				if (index === this.circles.length - 1) {
+					this.sc.rect(
+						circle.x - circle.radius + 15,
+						circle.y + circle.radius + 10,
+						70,
+						30,
+						5,
+						"Tail",
+						"white"
+					);
+				}
+				//head label
+				if (index === 0) {
+					this.sc.rect(
+						circle.x - circle.radius + 15,
+						circle.y + circle.radius + 10,
+						70,
+						30,
+						5,
+						"Head",
+						"white"
+					);
+				}
 			}
 		});
 
@@ -115,6 +116,7 @@ class CanvasObjectHandler {
 				radius: 50,
 				data: curr.data,
 				color: "white",
+				visible: true,
 			});
 
 			//to calculate placement of the circles

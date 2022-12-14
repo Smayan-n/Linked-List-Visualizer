@@ -39,7 +39,7 @@ canvas.addEventListener("mousedown", (e) => {
 	});
 });
 
-const ll = new LinkedList([1, 2]);
+const ll = new LinkedList([1, 2, 3, 4]);
 
 canvasObjHandler.generateCircles(ll);
 canvasObjHandler.generateArrows();
@@ -47,13 +47,39 @@ canvasObjHandler.generateArrows();
 let addAnimStart = false;
 let prependAnimStart = false;
 let insertAnimStart = false;
+let deleteLastAnimStart = false;
+let deleteFirstAnimStart = false;
+let deleteMiddleAnimStart = false;
 let newNode = null;
 let newArrow = null;
 let animationObjects = [];
 
-let insertIndex = null;
 let leftArrow = null;
 let rightArrow = null;
+
+let deleteIndex = null;
+$(".delete-btn").on("click", () => {
+	deleteIndex = parseInt($(".del-index-input").val());
+	if (deleteIndex === ll.length() - 1) {
+		newNode = canvasObjHandler.circles[deleteIndex];
+		canvasObjHandler.circles[deleteIndex].visible = false;
+		deleteLastAnimStart = true;
+	} else if (deleteIndex === 0) {
+		newNode = canvasObjHandler.circles[deleteIndex];
+		canvasObjHandler.circles[deleteIndex].visible = false;
+		deleteFirstAnimStart = true;
+	} else {
+		newNode = canvasObjHandler.circles[deleteIndex];
+		// canvasObjHandler.circles[deleteIndex].visible = false;
+		leftArrow = canvasObjHandler.arrows[deleteIndex - 1];
+		rightArrow = canvasObjHandler.arrows.splice(deleteIndex, 1)[0];
+
+		deleteMiddleAnimStart = true;
+	}
+});
+
+let insertIndex = null;
+
 $(".insert-btn").on("click", () => {
 	$("canvas").css("cursor", "crosshair");
 
@@ -65,6 +91,7 @@ $(".insert-btn").on("click", () => {
 			radius: 50,
 			data: $(".data-input").val(),
 			color: "white",
+			visible: true,
 		};
 		leftArrow = canvasObjHandler.arrows[insertIndex - 1];
 		rightArrow = {
@@ -91,6 +118,7 @@ $(".prepend-btn").on("click", () => {
 			radius: 50,
 			data: $(".data-input").val(),
 			color: "white",
+			visible: true,
 		};
 		newArrow = {
 			index: canvasObjHandler.arrows.length,
@@ -101,14 +129,10 @@ $(".prepend-btn").on("click", () => {
 			width: 5,
 			color: "red",
 		};
-		ll.prepend(12);
 		prependAnimStart = true;
 		canvas.onclick = null;
 		$("canvas").css("cursor", "default");
 	};
-	// animationObjects = canvasObjHandler.getAnimationObjects(ll, 0);
-	// newNode = animationObjects[0];
-	// newArrow = animationObjects[1];
 });
 
 $(".add-btn").on("click", () => {
@@ -120,6 +144,7 @@ $(".add-btn").on("click", () => {
 			radius: 50,
 			data: $(".data-input").val(),
 			color: "white",
+			visible: true,
 		};
 		newArrow = {
 			index: canvasObjHandler.arrows.length,
@@ -130,24 +155,17 @@ $(".add-btn").on("click", () => {
 			width: 5,
 			color: "red",
 		};
-		ll.append(12);
 		addAnimStart = true;
 		canvas.onclick = null;
 		$("canvas").css("cursor", "default");
 	};
-	// animationObjects = canvasObjHandler.getAnimationObjects(
-	// 	ll,
-	// 	ll.length() - 1
-	// );
-	// newNode = animationObjects[0];
-	// newArrow = animationObjects[1];
 });
 
 let animFrames = 0;
 //higher is slower
 const animSpeed = 30;
 
-//start simpleCanvas
+//start drawing
 draw();
 function draw() {
 	//refresh canvas and get new animation frame
@@ -155,6 +173,7 @@ function draw() {
 
 	//animation sequences
 
+	//add animations
 	if (addAnimStart) {
 		animFrames++;
 		if (animFrames < animSpeed) {
@@ -168,6 +187,7 @@ function draw() {
 			animator.animateLine(newArrow, animSpeed);
 		}
 		if (animFrames === animSpeed * 2) {
+			//add arrow to end
 			canvasObjHandler.arrows.push(newArrow);
 		}
 		if (animFrames > animSpeed * 2.1) {
@@ -178,6 +198,7 @@ function draw() {
 			addAnimStart = false;
 			animator.reset();
 			animFrames = 0;
+			ll.append(newNode.data);
 		}
 	}
 
@@ -194,6 +215,7 @@ function draw() {
 			animator.animateLine(newArrow, animSpeed);
 		}
 		if (animFrames === animSpeed * 2) {
+			//add arrow at position 0
 			canvasObjHandler.arrows.unshift(newArrow);
 		}
 		if (animFrames > animSpeed * 2.1) {
@@ -204,6 +226,7 @@ function draw() {
 			prependAnimStart = false;
 			animator.reset();
 			animFrames = 0;
+			ll.prepend(newNode.data);
 		}
 	}
 
@@ -244,7 +267,96 @@ function draw() {
 			insertAnimStart = false;
 			animFrames = 0;
 			//update actual linked list
-			ll.insertAtIndex(40, insertIndex);
+			ll.insertAtIndex(newNode.data, insertIndex);
+		}
+	}
+
+	//delete animations
+	if (deleteLastAnimStart) {
+		animFrames++;
+		if (animFrames < animSpeed) {
+			animator.animateCircle(newNode, animSpeed, true);
+		}
+		if (animFrames === animSpeed) {
+			//remove arrow
+			newArrow = canvasObjHandler.arrows.pop();
+		}
+		if (animFrames > animSpeed && animFrames < animSpeed * 2) {
+			animator.animateLine(newArrow, animSpeed, true, false);
+		}
+		if (animFrames === animSpeed * 2) {
+			canvasObjHandler.circles.pop();
+		}
+		if (animFrames > animSpeed * 2.2) {
+			deleteLastAnimStart = false;
+			animator.reset();
+			animFrames = 0;
+			ll.deleteAtIndex(ll.length() - 1);
+		}
+	}
+
+	if (deleteFirstAnimStart) {
+		animFrames++;
+		if (animFrames < animSpeed) {
+			animator.animateCircle(newNode, animSpeed, true);
+		}
+		if (animFrames === animSpeed) {
+			//remove arrow
+			newArrow = canvasObjHandler.arrows.shift();
+		}
+		if (animFrames > animSpeed && animFrames < animSpeed * 2) {
+			animator.animateLine(newArrow, animSpeed, true, true);
+		}
+		if (animFrames === animSpeed * 2) {
+			canvasObjHandler.circles.shift();
+		}
+		if (animFrames > animSpeed * 2.2) {
+			deleteFirstAnimStart = false;
+			animator.reset();
+			animFrames = 0;
+			ll.deleteAtIndex(0);
+		}
+	}
+
+	if (deleteMiddleAnimStart) {
+		animFrames++;
+		if (animFrames < animSpeed) {
+			animator.animateLine(rightArrow, animSpeed, true, false);
+		}
+		if (animFrames === animSpeed) {
+			//delete circle from arr so animation of it shrinking can be seen
+			canvasObjHandler.circles.splice(deleteIndex, 1);
+		}
+		if (animFrames >= animSpeed && animFrames < animSpeed * 2) {
+			//animate circle shrinking
+			animator.animateCircle(newNode, animSpeed * 1.01, true);
+		}
+		if (animFrames === animSpeed * 2) {
+			animator.reset(); //to avoid any weird line drawing
+			//delete arrow so it can be animated
+			canvasObjHandler.arrows.splice(deleteIndex - 1, 1);
+		}
+		if (animFrames >= animSpeed * 2 && animFrames < animSpeed * 3) {
+			//animate arrow moving
+			animator.animateMoveLine(
+				leftArrow,
+				{ x: rightArrow.x2, y: rightArrow.y2 },
+				animSpeed
+			);
+		}
+		if (animFrames === animSpeed * 3) {
+			//left arrow's end points are now changed
+			leftArrow.x2 = rightArrow.x2;
+			leftArrow.y2 = rightArrow.y2;
+			//left arrow is added to main list so it can be drawn
+			canvasObjHandler.arrows.splice(deleteIndex - 1, 0, leftArrow);
+		}
+		if (animFrames > animSpeed * 3) {
+			animator.reset();
+			deleteMiddleAnimStart = false;
+			animFrames = 0;
+			//update actual linked list
+			ll.deleteAtIndex(deleteIndex);
 		}
 	}
 
