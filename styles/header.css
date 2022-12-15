@@ -11,7 +11,7 @@
     left: 0;
     right: 0;
     top: 0;
-    height: 100px;
+    height: 120px;
     background-color: lightgray;
     z-index: 200;
 }
@@ -36,10 +36,85 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    gap: 20px;
 
 }
 
-.data-input, .pos-input{
-    width: 60px;
+.input-section{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+
+}
+.input-separator{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+.input-section input{
+    border: none;
+    font-family: "poppins";
+    height: 25px;
+    width: 120px;
+    font-size: 18px;
+    border-radius: 5px;
+    padding: 5px;
+}
+.input-section input:focus{
+    outline: none;
+}
+.input-section label{
+    font-family: "poppins";
+    font-size: 18px;
+    
+}
+.data-input{
+    margin-left: 4px;
+}
+
+.delete-section{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    width: 180px;
+}
+.delete-btn{
+    font-weight: 600;
+    font-family: "poppins";
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    background-color: red;
+    color: white;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.add-section{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 150px;
+
+}
+.add-section button{
+    font-weight: 500;
+    font-family: "poppins";
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    background-color: green;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+}
+button:hover{
+    opacity: 0.8;
 }

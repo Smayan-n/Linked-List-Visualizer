@@ -1,3 +1,5 @@
+//NOTE: THE RADIUS VALUE IS HARDCODED
+
 const canvas = document.getElementById("canvas");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight - canvas.offsetTop - 4;
@@ -6,6 +8,22 @@ const ctx = canvas.getContext("2d");
 const simpleCanvas = new SimpleCanvas(ctx);
 const animator = new CanvasAnimation(simpleCanvas);
 const canvasObjHandler = new CanvasObjectHandler(simpleCanvas);
+
+//creates a custom animated popup
+const createPopup = (text) => {
+	$(".popup").text(text);
+
+	$(".popup").css("visibility", "visible");
+	$(".popup").addClass("slideAnimStart");
+	setTimeout(() => {
+		$(".popup").removeClass("slideAnimStart");
+		$(".popup").addClass("slideAnimEnd");
+		setTimeout(() => {
+			$(".popup").removeClass("slideAnimEnd");
+			$(".popup").css("visibility", "hidden");
+		}, 500);
+	}, 1500);
+};
 
 //handle dragging on nodes
 canvas.addEventListener("mousedown", (e) => {
@@ -24,9 +42,30 @@ canvas.addEventListener("mousedown", (e) => {
 				dx: circle.x - clickX,
 				dy: circle.y - clickY,
 			};
+
 			canvas.onmousemove = (e) => {
 				//update arrows as well
 				canvasObjHandler.generateArrows();
+
+				//circle intersection detection - so circles don't overlap
+				// let intersect = false;
+				// canvasObjHandler.circles.forEach((c2) => {
+				// 	if (JSON.stringify(circle) !== JSON.stringify(c2)) {
+				// 		if (
+				// 			canvasObjHandler.circleIntersect(
+				// 				e.offsetX + offsets.dx,
+				// 				e.offsetY + offsets.dy,
+				// 				c2.x,
+				// 				c2.y,
+				// 				c2.radius,
+				// 				c2.radius
+				// 			)
+				// 		) {
+				// 			intersect = true;
+				// 			return;
+				// 		}
+				// 	}
+				// });
 
 				circle.x = e.offsetX + offsets.dx;
 				circle.y = e.offsetY + offsets.dy;
@@ -37,6 +76,13 @@ canvas.addEventListener("mousedown", (e) => {
 			};
 		}
 	});
+});
+
+//change text on delete and insert buttons depending on index input
+$(".index-input").on("change", () => {
+	let index = getIndex();
+	$(".delete-btn").text(`Delete at index ${index}`);
+	$(".insert-btn").text(`Insert at index ${index}`);
 });
 
 const ll = new LinkedList([1, 2, 3, 4]);
@@ -59,7 +105,11 @@ let rightArrow = null;
 
 let deleteIndex = null;
 $(".delete-btn").on("click", () => {
-	deleteIndex = parseInt($(".del-index-input").val());
+	deleteIndex = getIndex();
+	if (deleteIndex > ll.length() - 1 || deleteIndex < 0) {
+		createPopup("Index out of bounds");
+		return;
+	}
 	if (deleteIndex === ll.length() - 1) {
 		newNode = canvasObjHandler.circles[deleteIndex];
 		canvasObjHandler.circles[deleteIndex].visible = false;
@@ -73,7 +123,6 @@ $(".delete-btn").on("click", () => {
 		// canvasObjHandler.circles[deleteIndex].visible = false;
 		leftArrow = canvasObjHandler.arrows[deleteIndex - 1];
 		rightArrow = canvasObjHandler.arrows.splice(deleteIndex, 1)[0];
-
 		deleteMiddleAnimStart = true;
 	}
 });
@@ -81,15 +130,63 @@ $(".delete-btn").on("click", () => {
 let insertIndex = null;
 
 $(".insert-btn").on("click", () => {
-	$("canvas").css("cursor", "crosshair");
+	insertIndex = getIndex();
+	//redirecting insertion to append and prepend functions if index is 0 or ll.length()
+	if (insertIndex === ll.length()) {
+		append();
+	} else if (insertIndex === 0) {
+		prepend();
+	} else {
+		insert();
+	}
+});
 
+$(".prepend-btn").on("click", () => {
+	prepend();
+});
+
+$(".add-btn").on("click", () => {
+	append();
+});
+
+const prepend = () => {
+	$("canvas").css("cursor", "crosshair");
 	canvas.onclick = (e) => {
-		insertIndex = $(".pos-input").val();
 		newNode = {
 			x: e.offsetX,
 			y: e.offsetY,
 			radius: 50,
-			data: $(".data-input").val(),
+			data: getData(),
+			color: "white",
+			visible: true,
+		};
+		newArrow = {
+			index: canvasObjHandler.arrows.length,
+			x1: newNode.x,
+			y1: newNode.y,
+			x2: canvasObjHandler.circles[0].x,
+			y2: canvasObjHandler.circles[0].y,
+			width: 5,
+			color: "red",
+		};
+		prependAnimStart = true;
+		canvas.onclick = null;
+		$("canvas").css("cursor", "default");
+	};
+};
+
+const insert = () => {
+	if (insertIndex > ll.length() || insertIndex < 0) {
+		createPopup("Index out of bounds");
+		return;
+	}
+	$("canvas").css("cursor", "crosshair");
+	canvas.onclick = (e) => {
+		newNode = {
+			x: e.offsetX,
+			y: e.offsetY,
+			radius: 50,
+			data: getData(),
 			color: "white",
 			visible: true,
 		};
@@ -107,42 +204,16 @@ $(".insert-btn").on("click", () => {
 		canvas.onclick = null;
 		$("canvas").css("cursor", "default");
 	};
-});
+};
 
-$(".prepend-btn").on("click", () => {
+const append = () => {
 	$("canvas").css("cursor", "crosshair");
 	canvas.onclick = (e) => {
 		newNode = {
 			x: e.offsetX,
 			y: e.offsetY,
 			radius: 50,
-			data: $(".data-input").val(),
-			color: "white",
-			visible: true,
-		};
-		newArrow = {
-			index: canvasObjHandler.arrows.length,
-			x1: newNode.x,
-			y1: newNode.y,
-			x2: canvasObjHandler.circles[0].x,
-			y2: canvasObjHandler.circles[0].y,
-			width: 5,
-			color: "red",
-		};
-		prependAnimStart = true;
-		canvas.onclick = null;
-		$("canvas").css("cursor", "default");
-	};
-});
-
-$(".add-btn").on("click", () => {
-	$("canvas").css("cursor", "crosshair");
-	canvas.onclick = (e) => {
-		newNode = {
-			x: e.offsetX,
-			y: e.offsetY,
-			radius: 50,
-			data: $(".data-input").val(),
+			data: getData(),
 			color: "white",
 			visible: true,
 		};
@@ -159,7 +230,23 @@ $(".add-btn").on("click", () => {
 		canvas.onclick = null;
 		$("canvas").css("cursor", "default");
 	};
-});
+};
+
+//methods for validation
+const getIndex = () => {
+	let index = $(".index-input").val();
+	if (index === "") {
+		return 0;
+	}
+	return parseInt(index);
+};
+const getData = () => {
+	let data = $(".data-input").val();
+	if (data === "") {
+		return 10;
+	}
+	return parseInt(data);
+};
 
 let animFrames = 0;
 //higher is slower

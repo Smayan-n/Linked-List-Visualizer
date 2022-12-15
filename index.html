@@ -21,6 +21,8 @@
 		<script src="scripts/main.js" defer></script>
 	</head>
 	<body>
+		<div class="popup">Index out of bounds</div>
+
 		<div class="header">
 			<div class="left-section">
 				<label for="dropdown"></label>
@@ -33,35 +35,39 @@
 			</div>
 
 			<div class="right-section">
-				<label for="del-index-input">Pos: </label>
-				<input
-					type="number"
-					step="1"
-					class="del-index-input"
-					id="del-index-input"
-					value="0"
-				/>
-				<button class="delete-btn">Delete</button>
+				<div class="input-section">
+					<div class="input-seperator">
+						<label for="index-input">Index: </label>
+						<input
+							type="number"
+							step="1"
+							class="index-input"
+							id="index-input"
+							value="0"
+						/>
+					</div>
 
-				<label for="data-input">Data: </label>
-				<input
-					type="number"
-					step="1"
-					class="data-input"
-					id="data-input"
-					value="10"
-				/>
-				<button class="add-btn">Add</button>
-				<button class="prepend-btn">Prepend</button>
-				<button class="insert-btn">insert</button>
-				<label for="pos-input">Pos: </label>
-				<input
-					type="number"
-					step="1"
-					class="pos-input"
-					id="pos-input"
-					value="1"
-				/>
+					<div class="input-seperator">
+						<label for="data-input">Data: </label>
+						<input
+							type="number"
+							step="1"
+							class="data-input"
+							id="data-input"
+							value="10"
+						/>
+					</div>
+				</div>
+
+				<div class="delete-section">
+					<button class="delete-btn">Delete at index 0</button>
+				</div>
+
+				<div class="add-section">
+					<button class="add-btn">Append Node</button>
+					<button class="insert-btn">Insert at index 0</button>
+					<button class="prepend-btn">Prepend Node</button>
+				</div>
 			</div>
 		</div>
 

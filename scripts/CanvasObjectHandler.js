@@ -136,8 +136,37 @@ class CanvasObjectHandler {
 		this.circles = nodes;
 	}
 
+	circleIntersect(x1, y1, x2, y2, r1, r2) {
+		//distance
+		let d = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+		// let r1 = c1.radius;
+		// let r2 = c2.radius;
+
+		//c2 is inside c1
+		if (d <= r1 - r2) {
+			return true;
+		}
+		//c1 is inside c2
+		if (d <= r2 - r1) {
+			return true;
+		}
+		//circles intersect
+		if (d < r1 + r2) {
+			return true;
+		}
+		//circles touch
+		if (d === r1 + r2) {
+			return true;
+		}
+		//circles don't intersect or touch
+		else {
+			return false;
+		}
+	}
+
 	//returns a list of circles and arrows that have to be animated
 	//NOTE: CAN BE OPTIMIZED - LOOK AT MAIN FILE
+	//NOT USED RIGHT NOW
 	getAnimationObjects(ll, index) {
 		//ll is the linked list
 		//index is of the node that is added
