@@ -138,7 +138,7 @@ class CanvasObjectHandler {
 
 	circleIntersect(x1, y1, x2, y2, r1, r2) {
 		//distance
-		let d = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+		let d = distance(x1, y1, x2, y2);
 		// let r1 = c1.radius;
 		// let r2 = c2.radius;
 

@@ -9,22 +9,6 @@ const simpleCanvas = new SimpleCanvas(ctx);
 const animator = new CanvasAnimation(simpleCanvas);
 const canvasObjHandler = new CanvasObjectHandler(simpleCanvas);
 
-//creates a custom animated popup
-const createPopup = (text) => {
-	$(".popup").text(text);
-
-	$(".popup").css("visibility", "visible");
-	$(".popup").addClass("slideAnimStart");
-	setTimeout(() => {
-		$(".popup").removeClass("slideAnimStart");
-		$(".popup").addClass("slideAnimEnd");
-		setTimeout(() => {
-			$(".popup").removeClass("slideAnimEnd");
-			$(".popup").css("visibility", "hidden");
-		}, 500);
-	}, 1500);
-};
-
 //handle dragging on nodes
 canvas.addEventListener("mousedown", (e) => {
 	canvasObjHandler.circles.forEach((circle) => {
@@ -106,10 +90,16 @@ let rightArrow = null;
 let deleteIndex = null;
 $(".delete-btn").on("click", () => {
 	deleteIndex = getIndex();
+	//validations
 	if (deleteIndex > ll.length() - 1 || deleteIndex < 0) {
-		createPopup("Index out of bounds");
+		createPopup("Index out of bounds", "red");
 		return;
 	}
+	if (ll.length() === 1) {
+		createPopup("Cannot delete head", "red");
+		return;
+	}
+
 	if (deleteIndex === ll.length() - 1) {
 		newNode = canvasObjHandler.circles[deleteIndex];
 		canvasObjHandler.circles[deleteIndex].visible = false;
@@ -149,9 +139,13 @@ $(".add-btn").on("click", () => {
 	append();
 });
 
+//prepend and append functions could be optimized to use the same code
 const prepend = () => {
 	$("canvas").css("cursor", "crosshair");
+	openPopup("Click anywhere on canvas to prepend node");
+
 	canvas.onclick = (e) => {
+		closePopup();
 		newNode = {
 			x: e.offsetX,
 			y: e.offsetY,
@@ -177,11 +171,14 @@ const prepend = () => {
 
 const insert = () => {
 	if (insertIndex > ll.length() || insertIndex < 0) {
-		createPopup("Index out of bounds");
+		createPopup("Index out of bounds", "red");
 		return;
 	}
 	$("canvas").css("cursor", "crosshair");
+	openPopup("Click anywhere on canvas to insert node");
+
 	canvas.onclick = (e) => {
+		closePopup();
 		newNode = {
 			x: e.offsetX,
 			y: e.offsetY,
@@ -208,7 +205,10 @@ const insert = () => {
 
 const append = () => {
 	$("canvas").css("cursor", "crosshair");
+	openPopup("Click anywhere on canvas to append node");
+
 	canvas.onclick = (e) => {
+		closePopup();
 		newNode = {
 			x: e.offsetX,
 			y: e.offsetY,

@@ -108,6 +108,7 @@ class CanvasAnimation {
 		this.canvas = simpleCanvas;
 
 		this.circleRadOffset = 0;
+		this.circleRadRange = 48;
 
 		this.offsetx = 0;
 		this.offsety = 0;
@@ -122,14 +123,14 @@ class CanvasAnimation {
 			circle.y,
 			reversed
 				? circle.radius - this.circleRadOffset
-				: circle.radius - 40 + this.circleRadOffset,
+				: circle.radius - this.circleRadRange + this.circleRadOffset,
 			circle.data,
 			"white"
 		);
 
-		this.circleRadOffset += 40 / animTime;
+		this.circleRadOffset += this.circleRadRange / animTime;
 
-		if (this.circleRadOffset >= 40) {
+		if (this.circleRadOffset >= this.circleRadRange) {
 			this.canvas.circle(
 				circle.x,
 				circle.y,
