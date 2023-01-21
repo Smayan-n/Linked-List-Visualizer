@@ -1,4 +1,5 @@
-//NOTE: THE RADIUS VALUE IS HARDCODED
+//Main JS file
+//handles all the animations and events
 
 const canvas = document.getElementById("canvas");
 canvas.width = window.innerWidth;
@@ -10,11 +11,24 @@ const animator = new CanvasAnimation(simpleCanvas);
 const canvasObjHandler = new CanvasObjectHandler(simpleCanvas);
 
 //window resize event listener
-//resize canvas and regenerate circle and arrow positions so they fit on screen
+//resize canvas and regenerate circle and arrow positions so they stay in the same relative positions as before
+let relativeCirclePositions;
 window.addEventListener("resize", () => {
+	//relative positions before resizing
+	relativeCirclePositions = [];
+	canvasObjHandler.circles.forEach((circle) => {
+		relativeCirclePositions.push({ percentX: circle.x / canvas.width, percentY: circle.y / canvas.height });
+	});
+	//resize canvas
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight - canvas.offsetTop;
-	canvasObjHandler.generateCircles(ll);
+
+	//place circles in proper relative positions
+	for (let i = 0; i < canvasObjHandler.circles.length; i++) {
+		canvasObjHandler.circles[i].x = relativeCirclePositions[i].percentX * canvas.width;
+		canvasObjHandler.circles[i].y = relativeCirclePositions[i].percentY * canvas.height;
+	}
+	//re-generate arrows to point correctly
 	canvasObjHandler.generateArrows();
 });
 
@@ -40,26 +54,6 @@ canvas.addEventListener("mousedown", (e) => {
 				//update arrows as well
 				canvasObjHandler.generateArrows();
 
-				//circle intersection detection - so circles don't overlap
-				// let intersect = false;
-				// canvasObjHandler.circles.forEach((c2) => {
-				// 	if (JSON.stringify(circle) !== JSON.stringify(c2)) {
-				// 		if (
-				// 			canvasObjHandler.circleIntersect(
-				// 				e.offsetX + offsets.dx,
-				// 				e.offsetY + offsets.dy,
-				// 				c2.x,
-				// 				c2.y,
-				// 				c2.radius,
-				// 				c2.radius
-				// 			)
-				// 		) {
-				// 			intersect = true;
-				// 			return;
-				// 		}
-				// 	}
-				// });
-
 				circle.x = e.offsetX + offsets.dx;
 				circle.y = e.offsetY + offsets.dy;
 			};
@@ -78,6 +72,7 @@ $(".index-input").on("change", () => {
 	$(".insert-btn").text(`Insert at index ${index}`);
 });
 
+//initialize linked list
 const ll = new LinkedList([1, 2, 3, 4]);
 
 canvasObjHandler.generateCircles(ll);
@@ -90,6 +85,9 @@ let insertAnimStart = false;
 let deleteLastAnimStart = false;
 let deleteFirstAnimStart = false;
 let deleteMiddleAnimStart = false;
+
+//if true, delete animation needed, else insert animation needed
+let delOrInsertAnim = null;
 
 let newNode = null;
 let newArrow = null;
@@ -123,6 +121,7 @@ $(".delete-btn").on("click", () => {
 		leftArrow = canvasObjHandler.arrows[deleteIndex - 1];
 		rightArrow = canvasObjHandler.arrows[deleteIndex];
 		//start traversing animation
+		delOrInsertAnim = true;
 		traverseIndex = deleteIndex;
 		traverseAnimStart = true;
 	}
@@ -213,6 +212,7 @@ const insert = () => {
 			color: "red",
 		};
 		//start traversing animation
+		delOrInsertAnim = false;
 		traverseIndex = insertIndex;
 		traverseAnimStart = true;
 		canvas.onclick = null;
@@ -285,31 +285,35 @@ function draw() {
 		animFrames++;
 		if (animFrames < animSpeed) {
 			const c = { ...canvasObjHandler.circles[currTraverseAnimIndex] };
-			c.radius = 57;
+			c.radius = 57; //hardcoded value
 			c.color = "orange";
 			simpleCanvas.circle(c.x, c.y, c.radius, c.data, c.color);
 		}
-		if (
-			animFrames === animSpeed &&
-			currTraverseAnimIndex >= traverseIndex
-		) {
+		//to skip arrow animation in some scenarios
+		if (animFrames === animSpeed && currTraverseAnimIndex >= (delOrInsertAnim ? traverseIndex : traverseIndex - 1)) {
 			animFrames = animSpeed * 2;
 		}
 		if (animFrames > animSpeed && animFrames < animSpeed * 2) {
 			const a = { ...canvasObjHandler.arrows[currTraverseAnimIndex] };
-			a.width = 12;
+			a.width = 12; //hardcoded value
 			animator.animateLine(a, animSpeed);
-			// simpleCanvas.arrow(a.x1, a.y1, a.x2, a.y2, a.width, "blue");
 		}
 		if (animFrames === animSpeed * 2) {
-			if (currTraverseAnimIndex < traverseIndex) {
+			//if traversing is not finished
+			if (currTraverseAnimIndex < (delOrInsertAnim ? traverseIndex : traverseIndex - 1)) {
 				currTraverseAnimIndex++;
 				animFrames = 0;
 				animator.reset();
+
+				//if traversing is finished, finish animations and start insert/delete animations
 			} else {
+				if (delOrInsertAnim) {
+					deleteMiddleAnimStart = true;
+				} else {
+					insertAnimStart = true;
+				}
 				traverseAnimStart = false;
-				deleteMiddleAnimStart = true;
-				// insertAnimStart = true;
+
 				currTraverseAnimIndex = 0;
 				animFrames = 0;
 				canvasObjHandler.tempCircles = [];
@@ -387,11 +391,7 @@ function draw() {
 		}
 		if (animFrames >= animSpeed && animFrames < animSpeed * 2) {
 			//animate left arrow moving to new node
-			animator.animateMoveLine(
-				leftArrow,
-				{ x: newNode.x, y: newNode.y },
-				animSpeed
-			);
+			animator.animateMoveLine(leftArrow, { x: newNode.x, y: newNode.y }, animSpeed);
 		}
 		if (animFrames === animSpeed * 2) {
 			animator.reset(); //to avoid any weird line drawing
@@ -488,11 +488,7 @@ function draw() {
 		}
 		if (animFrames >= animSpeed * 2 && animFrames < animSpeed * 3) {
 			//animate arrow moving
-			animator.animateMoveLine(
-				leftArrow,
-				{ x: rightArrow.x2, y: rightArrow.y2 },
-				animSpeed
-			);
+			animator.animateMoveLine(leftArrow, { x: rightArrow.x2, y: rightArrow.y2 }, animSpeed);
 		}
 		if (animFrames === animSpeed * 3) {
 			//left arrow's end points are now changed

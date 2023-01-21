@@ -1,4 +1,5 @@
-//this is a class that can be used to simplify the drawing of shapes on a HTML canvas
+//this is a class that can be used to simplify the drawing and animating of shapes on a HTML canvas
+
 class SimpleCanvas {
 	constructor(canvasContext) {
 		//canvas this.ctx
@@ -52,24 +53,15 @@ class SimpleCanvas {
 		//the point
 		this.ctx.beginPath();
 		this.ctx.moveTo(tox, toy);
-		this.ctx.lineTo(
-			tox - headlen * Math.cos(angle - Math.PI / 7),
-			toy - headlen * Math.sin(angle - Math.PI / 7)
-		);
+		this.ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 7), toy - headlen * Math.sin(angle - Math.PI / 7));
 
 		//path from the side point of the arrow, to the other side point
-		this.ctx.lineTo(
-			tox - headlen * Math.cos(angle + Math.PI / 7),
-			toy - headlen * Math.sin(angle + Math.PI / 7)
-		);
+		this.ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 7), toy - headlen * Math.sin(angle + Math.PI / 7));
 
 		//path from the side point back to the tip of the arrow, and then
 		//again to the opposite side point
 		this.ctx.lineTo(tox, toy);
-		this.ctx.lineTo(
-			tox - headlen * Math.cos(angle - Math.PI / 7),
-			toy - headlen * Math.sin(angle - Math.PI / 7)
-		);
+		this.ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 7), toy - headlen * Math.sin(angle - Math.PI / 7));
 
 		//draws the paths created above
 		this.ctx.stroke();
@@ -121,9 +113,7 @@ class CanvasAnimation {
 		this.canvas.circle(
 			circle.x,
 			circle.y,
-			reversed
-				? circle.radius - this.circleRadOffset
-				: circle.radius - this.circleRadRange + this.circleRadOffset,
+			reversed ? circle.radius - this.circleRadOffset : circle.radius - this.circleRadRange + this.circleRadOffset,
 			circle.data,
 			"white"
 		);
@@ -146,38 +136,14 @@ class CanvasAnimation {
 
 		collapse
 			? reversed
-				? this.canvas.arrow(
-						arrow.x1 - this.offsetx,
-						arrow.y1 - this.offsety,
-						arrow.x2,
-						arrow.y2,
-						arrow.width,
-						"blue"
-				  )
-				: this.canvas.arrow(
-						arrow.x1,
-						arrow.y1,
-						arrow.x2 + this.offsetx,
-						arrow.y2 + this.offsety,
-						arrow.width,
-						"blue"
-				  )
-			: this.canvas.arrow(
-					arrow.x1,
-					arrow.y1,
-					arrow.x1 - this.offsetx,
-					arrow.y1 - this.offsety,
-					arrow.width,
-					"blue"
-			  );
+				? this.canvas.arrow(arrow.x1 - this.offsetx, arrow.y1 - this.offsety, arrow.x2, arrow.y2, arrow.width, "blue")
+				: this.canvas.arrow(arrow.x1, arrow.y1, arrow.x2 + this.offsetx, arrow.y2 + this.offsety, arrow.width, "blue")
+			: this.canvas.arrow(arrow.x1, arrow.y1, arrow.x1 - this.offsetx, arrow.y1 - this.offsety, arrow.width, "blue");
 
 		this.offsetx += distX / animTime;
 		this.offsety += distY / animTime;
 
-		if (
-			Math.abs(this.offsetx) >= Math.abs(distX) ||
-			Math.abs(this.offsety) >= Math.abs(distY)
-		) {
+		if (Math.abs(this.offsetx) >= Math.abs(distX) || Math.abs(this.offsety) >= Math.abs(distY)) {
 			//end animation
 			return true;
 		}
@@ -189,23 +155,13 @@ class CanvasAnimation {
 		const distX = arrow.x2 - endCoord.x;
 		const distY = arrow.y2 - endCoord.y;
 
-		this.canvas.arrow(
-			arrow.x1,
-			arrow.y1,
-			arrow.x2 - this.offsetx,
-			arrow.y2 - this.offsety,
-			arrow.width,
-			"blue"
-		);
+		this.canvas.arrow(arrow.x1, arrow.y1, arrow.x2 - this.offsetx, arrow.y2 - this.offsety, arrow.width, "blue");
 		//slowly adding fractions to offset
 		this.offsetx += distX / animTime;
 		this.offsety += distY / animTime;
 
 		//animation complete when offset is equal to distance
-		if (
-			Math.abs(this.offsetx) >= Math.abs(distX) ||
-			Math.abs(this.offsety) >= Math.abs(distY)
-		) {
+		if (Math.abs(this.offsetx) >= Math.abs(distX) || Math.abs(this.offsety) >= Math.abs(distY)) {
 			return true;
 		}
 	}

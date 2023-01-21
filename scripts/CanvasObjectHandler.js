@@ -29,13 +29,7 @@ class CanvasObjectHandler {
 		//drawing temporary circles that are being animated
 		//temporary circles are needed so there are no color coding problems caused (head and tail have colors)
 		this.tempCircles.forEach((circle) => {
-			this.sc.circle(
-				circle.x,
-				circle.y,
-				circle.radius,
-				circle.data,
-				circle.color
-			);
+			this.sc.circle(circle.x, circle.y, circle.radius, circle.data, circle.color);
 		});
 
 		this.circles.forEach((circle, index) => {
@@ -46,36 +40,16 @@ class CanvasObjectHandler {
 					circle.radius,
 					circle.data,
 					//head is green and tail is aqua
-					index === 0
-						? "green"
-						: index === this.circles.length - 1
-						? "aqua"
-						: circle.color
+					index === 0 ? "green" : index === this.circles.length - 1 ? "aqua" : circle.color
 				);
 				//draw head and tail labels on nodes
 				//tail label
 				if (index === this.circles.length - 1) {
-					this.sc.rect(
-						circle.x - circle.radius + 15,
-						circle.y + circle.radius + 10,
-						70,
-						30,
-						5,
-						"Tail",
-						"white"
-					);
+					this.sc.rect(circle.x - circle.radius + 15, circle.y + circle.radius + 10, 70, 30, 5, "Tail", "white");
 				}
 				//head label
 				if (index === 0) {
-					this.sc.rect(
-						circle.x - circle.radius + 15,
-						circle.y + circle.radius + 10,
-						70,
-						30,
-						5,
-						"Head",
-						"white"
-					);
+					this.sc.rect(circle.x - circle.radius + 15, circle.y + circle.radius + 10, 70, 30, 5, "Head", "white");
 				}
 			}
 		});
@@ -131,35 +105,5 @@ class CanvasObjectHandler {
 		}
 
 		this.circles = nodes;
-	}
-
-	//returns a list of circles and arrows that have to be animated
-	//NOTE: CAN BE OPTIMIZED - LOOK AT MAIN FILE
-	//NOT USED RIGHT NOW
-	getAnimationObjects(ll, index) {
-		//ll is the linked list
-		//index is of the node that is added
-
-		this.generateCircles(ll);
-		this.generateArrows();
-
-		const animationObjects = [];
-
-		animationObjects.push(this.circles[index]);
-		this.circles.splice(index, 1);
-
-		if (index === 0) {
-			animationObjects.push(this.arrows[0]);
-			this.arrows.splice(0, 1);
-		} else if (index === ll.length() - 1) {
-			animationObjects.push(this.arrows[this.arrows.length - 1]);
-			this.arrows.splice(this.arrows.length - 1, 1);
-		} else {
-			animationObjects.push(this.arrows[index - 1]);
-			animationObjects.push(this.arrows[index]);
-			this.arrows.splice(index - 1, 2);
-		}
-
-		return animationObjects;
 	}
 }
