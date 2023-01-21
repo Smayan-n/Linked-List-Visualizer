@@ -26,6 +26,18 @@ class CanvasObjectHandler {
 	}
 
 	drawCircles() {
+		//drawing temporary circles that are being animated
+		//temporary circles are needed so there are no color coding problems caused (head and tail have colors)
+		this.tempCircles.forEach((circle) => {
+			this.sc.circle(
+				circle.x,
+				circle.y,
+				circle.radius,
+				circle.data,
+				circle.color
+			);
+		});
+
 		this.circles.forEach((circle, index) => {
 			if (circle.visible) {
 				this.sc.circle(
@@ -67,18 +79,6 @@ class CanvasObjectHandler {
 				}
 			}
 		});
-
-		//drawing temporary circles that are being animated
-		//temporary circles are needed so there are no color coding problems caused (head and tail have colors)
-		this.tempCircles.forEach((circle) => {
-			this.sc.circle(
-				circle.x,
-				circle.y,
-				circle.radius,
-				circle.data,
-				circle.color
-			);
-		});
 	}
 
 	//generates a list of all arrows connecting the nodes
@@ -86,7 +86,6 @@ class CanvasObjectHandler {
 		const arrows = [];
 		for (let i = 0; i < this.circles.length - 1; i++) {
 			arrows.push({
-				index: i,
 				x1: this.circles[i].x,
 				y1: this.circles[i].y,
 				x2: this.circles[i + 1].x,
@@ -107,7 +106,6 @@ class CanvasObjectHandler {
 		let x = 75;
 		let y = 75;
 		let flag = true;
-		let index = 0;
 		//traversing through linked list
 		while (curr) {
 			nodes.push({
@@ -130,38 +128,9 @@ class CanvasObjectHandler {
 			}
 
 			curr = curr.next;
-			index++;
 		}
 
 		this.circles = nodes;
-	}
-
-	circleIntersect(x1, y1, x2, y2, r1, r2) {
-		//distance
-		let d = distance(x1, y1, x2, y2);
-		// let r1 = c1.radius;
-		// let r2 = c2.radius;
-
-		//c2 is inside c1
-		if (d <= r1 - r2) {
-			return true;
-		}
-		//c1 is inside c2
-		if (d <= r2 - r1) {
-			return true;
-		}
-		//circles intersect
-		if (d < r1 + r2) {
-			return true;
-		}
-		//circles touch
-		if (d === r1 + r2) {
-			return true;
-		}
-		//circles don't intersect or touch
-		else {
-			return false;
-		}
 	}
 
 	//returns a list of circles and arrows that have to be animated
@@ -193,8 +162,4 @@ class CanvasObjectHandler {
 
 		return animationObjects;
 	}
-
-	// 1 -> 2 -> 3 -> 4
-	//[1, 2, 3, 4]
-	//[1, 2, 3]
 }

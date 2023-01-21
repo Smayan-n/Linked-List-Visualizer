@@ -39,3 +39,31 @@ function closePopup() {
 		$(".popup").css("visibility", "hidden");
 	}, 500);
 }
+
+function circleIntersect(x1, y1, x2, y2, r1, r2) {
+	//distance
+	let d = distance(x1, y1, x2, y2);
+	// let r1 = c1.radius;
+	// let r2 = c2.radius;
+
+	//c2 is inside c1
+	if (d <= r1 - r2) {
+		return true;
+	}
+	//c1 is inside c2
+	if (d <= r2 - r1) {
+		return true;
+	}
+	//circles intersect
+	if (d < r1 + r2) {
+		return true;
+	}
+	//circles touch
+	if (d === r1 + r2) {
+		return true;
+	}
+	//circles don't intersect or touch
+	else {
+		return false;
+	}
+}

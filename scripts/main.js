@@ -2,12 +2,21 @@
 
 const canvas = document.getElementById("canvas");
 canvas.width = window.innerWidth;
-canvas.height = window.innerHeight - canvas.offsetTop - 4;
+canvas.height = window.innerHeight - canvas.offsetTop;
 
 const ctx = canvas.getContext("2d");
 const simpleCanvas = new SimpleCanvas(ctx);
 const animator = new CanvasAnimation(simpleCanvas);
 const canvasObjHandler = new CanvasObjectHandler(simpleCanvas);
+
+//window resize event listener
+//resize canvas and regenerate circle and arrow positions so they fit on screen
+window.addEventListener("resize", () => {
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight - canvas.offsetTop;
+	canvasObjHandler.generateCircles(ll);
+	canvasObjHandler.generateArrows();
+});
 
 //handle dragging on nodes
 canvas.addEventListener("mousedown", (e) => {
@@ -74,15 +83,16 @@ const ll = new LinkedList([1, 2, 3, 4]);
 canvasObjHandler.generateCircles(ll);
 canvasObjHandler.generateArrows();
 
-let addAnimStart = false;
+//boolean values to check if animations has started
+let appendAnimStart = false;
 let prependAnimStart = false;
 let insertAnimStart = false;
 let deleteLastAnimStart = false;
 let deleteFirstAnimStart = false;
 let deleteMiddleAnimStart = false;
+
 let newNode = null;
 let newArrow = null;
-let animationObjects = [];
 
 let leftArrow = null;
 let rightArrow = null;
@@ -110,10 +120,11 @@ $(".delete-btn").on("click", () => {
 		deleteFirstAnimStart = true;
 	} else {
 		newNode = canvasObjHandler.circles[deleteIndex];
-		// canvasObjHandler.circles[deleteIndex].visible = false;
 		leftArrow = canvasObjHandler.arrows[deleteIndex - 1];
-		rightArrow = canvasObjHandler.arrows.splice(deleteIndex, 1)[0];
-		deleteMiddleAnimStart = true;
+		rightArrow = canvasObjHandler.arrows[deleteIndex];
+		//start traversing animation
+		traverseIndex = deleteIndex;
+		traverseAnimStart = true;
 	}
 });
 
@@ -139,6 +150,9 @@ $(".add-btn").on("click", () => {
 	append();
 });
 
+//traversingAnimation
+let traverseAnimStart = false;
+
 //prepend and append functions could be optimized to use the same code
 const prepend = () => {
 	$("canvas").css("cursor", "crosshair");
@@ -163,6 +177,7 @@ const prepend = () => {
 			width: 5,
 			color: "red",
 		};
+
 		prependAnimStart = true;
 		canvas.onclick = null;
 		$("canvas").css("cursor", "default");
@@ -197,7 +212,9 @@ const insert = () => {
 			width: 5,
 			color: "red",
 		};
-		insertAnimStart = true;
+		//start traversing animation
+		traverseIndex = insertIndex;
+		traverseAnimStart = true;
 		canvas.onclick = null;
 		$("canvas").css("cursor", "default");
 	};
@@ -226,31 +243,34 @@ const append = () => {
 			width: 5,
 			color: "red",
 		};
-		addAnimStart = true;
+		appendAnimStart = true;
 		canvas.onclick = null;
 		$("canvas").css("cursor", "default");
 	};
 };
 
-//methods for validation
+//methods to read and validate data and index inputs from user
 const getIndex = () => {
 	let index = $(".index-input").val();
 	if (index === "") {
-		return 0;
+		return 0; //default index value
 	}
 	return parseInt(index);
 };
 const getData = () => {
 	let data = $(".data-input").val();
 	if (data === "") {
-		return 10;
+		return 10; //default data value
 	}
 	return parseInt(data);
 };
 
+//animation vars
 let animFrames = 0;
-//higher is slower
-const animSpeed = 30;
+const animSpeed = 60; //higher is slower animations
+
+let currTraverseAnimIndex = 0;
+let traverseIndex;
 
 //start drawing
 draw();
@@ -258,10 +278,48 @@ function draw() {
 	//refresh canvas and get new animation frame
 	simpleCanvas.refresh(draw);
 
-	//animation sequences
+	//-----------------animation sequences-------------------
+
+	//traverse animation
+	if (traverseAnimStart) {
+		animFrames++;
+		if (animFrames < animSpeed) {
+			const c = { ...canvasObjHandler.circles[currTraverseAnimIndex] };
+			c.radius = 57;
+			c.color = "orange";
+			simpleCanvas.circle(c.x, c.y, c.radius, c.data, c.color);
+		}
+		if (
+			animFrames === animSpeed &&
+			currTraverseAnimIndex >= traverseIndex
+		) {
+			animFrames = animSpeed * 2;
+		}
+		if (animFrames > animSpeed && animFrames < animSpeed * 2) {
+			const a = { ...canvasObjHandler.arrows[currTraverseAnimIndex] };
+			a.width = 12;
+			animator.animateLine(a, animSpeed);
+			// simpleCanvas.arrow(a.x1, a.y1, a.x2, a.y2, a.width, "blue");
+		}
+		if (animFrames === animSpeed * 2) {
+			if (currTraverseAnimIndex < traverseIndex) {
+				currTraverseAnimIndex++;
+				animFrames = 0;
+				animator.reset();
+			} else {
+				traverseAnimStart = false;
+				deleteMiddleAnimStart = true;
+				// insertAnimStart = true;
+				currTraverseAnimIndex = 0;
+				animFrames = 0;
+				canvasObjHandler.tempCircles = [];
+				animator.reset();
+			}
+		}
+	}
 
 	//add animations
-	if (addAnimStart) {
+	if (appendAnimStart) {
 		animFrames++;
 		if (animFrames < animSpeed) {
 			animator.animateCircle(newNode, animSpeed);
@@ -282,7 +340,7 @@ function draw() {
 			canvasObjHandler.circles.push(newNode);
 			canvasObjHandler.tempCircles = [];
 
-			addAnimStart = false;
+			appendAnimStart = false;
 			animator.reset();
 			animFrames = 0;
 			ll.append(newNode.data);
@@ -372,6 +430,7 @@ function draw() {
 			animator.animateLine(newArrow, animSpeed, true, false);
 		}
 		if (animFrames === animSpeed * 2) {
+			//delete last circle
 			canvasObjHandler.circles.pop();
 		}
 		if (animFrames > animSpeed * 2.2) {
@@ -395,6 +454,7 @@ function draw() {
 			animator.animateLine(newArrow, animSpeed, true, true);
 		}
 		if (animFrames === animSpeed * 2) {
+			//delete first circle
 			canvasObjHandler.circles.shift();
 		}
 		if (animFrames > animSpeed * 2.2) {
@@ -407,6 +467,9 @@ function draw() {
 
 	if (deleteMiddleAnimStart) {
 		animFrames++;
+		if (animFrames === 1) {
+			canvasObjHandler.arrows.splice(deleteIndex, 1);
+		}
 		if (animFrames < animSpeed) {
 			animator.animateLine(rightArrow, animSpeed, true, false);
 		}
@@ -450,5 +513,4 @@ function draw() {
 	//drawing objects
 	canvasObjHandler.drawArrows();
 	canvasObjHandler.drawCircles();
-	// console.log(canvasObjHandler.arrows);
 }

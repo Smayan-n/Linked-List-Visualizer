@@ -131,50 +131,43 @@ class CanvasAnimation {
 		this.circleRadOffset += this.circleRadRange / animTime;
 
 		if (this.circleRadOffset >= this.circleRadRange) {
-			this.canvas.circle(
-				circle.x,
-				circle.y,
-				circle.radius,
-				circle.data,
-				"white"
-			);
 			//end animation
 			return true;
 		}
 	}
 
 	//takes in an arrow and uses it's x1, y1 and x2, y2 to animate the arrow growing from one coord to another
-	animateLine(points, animTime, collapse = false, reversed = false) {
+	animateLine(arrow, animTime, collapse = false, reversed = false) {
 		//collapse is opposite of arrow expanding
 		//collapse reverse means arrow collapses from tail to head and collapse not reversed means arrow collapses from head to tail
 
-		const distX = points.x1 - points.x2;
-		const distY = points.y1 - points.y2;
+		const distX = arrow.x1 - arrow.x2;
+		const distY = arrow.y1 - arrow.y2;
 
 		collapse
 			? reversed
 				? this.canvas.arrow(
-						points.x1 - this.offsetx,
-						points.y1 - this.offsety,
-						points.x2,
-						points.y2,
-						5,
+						arrow.x1 - this.offsetx,
+						arrow.y1 - this.offsety,
+						arrow.x2,
+						arrow.y2,
+						arrow.width,
 						"blue"
 				  )
 				: this.canvas.arrow(
-						points.x1,
-						points.y1,
-						points.x2 + this.offsetx,
-						points.y2 + this.offsety,
-						5,
+						arrow.x1,
+						arrow.y1,
+						arrow.x2 + this.offsetx,
+						arrow.y2 + this.offsety,
+						arrow.width,
 						"blue"
 				  )
 			: this.canvas.arrow(
-					points.x1,
-					points.y1,
-					points.x1 - this.offsetx,
-					points.y1 - this.offsety,
-					5,
+					arrow.x1,
+					arrow.y1,
+					arrow.x1 - this.offsetx,
+					arrow.y1 - this.offsety,
+					arrow.width,
 					"blue"
 			  );
 
@@ -191,17 +184,17 @@ class CanvasAnimation {
 	}
 
 	//animates arrow moving to endcoord
-	animateMoveLine(points, endCoord, animTime) {
+	animateMoveLine(arrow, endCoord, animTime) {
 		//separate distances between end of arrow and new node coords (where the arrow will end up)
-		const distX = points.x2 - endCoord.x;
-		const distY = points.y2 - endCoord.y;
+		const distX = arrow.x2 - endCoord.x;
+		const distY = arrow.y2 - endCoord.y;
 
 		this.canvas.arrow(
-			points.x1,
-			points.y1,
-			points.x2 - this.offsetx,
-			points.y2 - this.offsety,
-			5,
+			arrow.x1,
+			arrow.y1,
+			arrow.x2 - this.offsetx,
+			arrow.y2 - this.offsety,
+			arrow.width,
 			"blue"
 		);
 		//slowly adding fractions to offset
