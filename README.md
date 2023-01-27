@@ -7,8 +7,10 @@ This tool is designed to help visualize and understand the basic concepts of lin
   * Step-by-step visualization of common linked list operations (such as insertion and deletion)
   * nodes can be moved around anywhere - so play with it!
   * ability to reset position of nodes
-  
-To use, you can visit the githib page for this repo: https://smayan-n.github.io/Linked-List-Visualizer/
-or you can open the `index.html` file on your computer to run it locally
+
+# Usage: #
+* visit the githib page for this repo: https://smayan-n.github.io/Linked-List-Visualizer/
+* Diwnload or clone repository and open the `index.html` file
+
 
 ![image](https://user-images.githubusercontent.com/86111841/214996800-6a97689a-a96b-4b7a-ab5a-5f66fcc58043.png)
