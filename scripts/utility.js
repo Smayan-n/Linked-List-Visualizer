@@ -40,6 +40,27 @@ function closePopup() {
 	}, 500);
 }
 
+//function to return a set of coords for the circles so they are arranged in a regular order
+function getRegularCoords(numCircles) {
+	const coords = [];
+	let xCoord = 75;
+	let yCoord = 75;
+	let flag = true;
+	for (let i = 0; i < numCircles; i++) {
+		coords.push({ x: xCoord, y: yCoord });
+		//to calculate placement of the circles
+		xCoord += (window.innerWidth - 50) / ll.length();
+		if (flag) {
+			yCoord += 100;
+			flag = false;
+		} else {
+			yCoord -= 100;
+			flag = true;
+		}
+	}
+	return coords;
+}
+
 function circleIntersect(x1, y1, x2, y2, r1, r2) {
 	//distance
 	let d = distance(x1, y1, x2, y2);

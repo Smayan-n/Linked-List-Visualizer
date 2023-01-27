@@ -10,10 +10,7 @@
 		<link rel="stylesheet" href="styles/header.css" />
 		<link rel="stylesheet" href="styles/canvas.css" />
 
-		<script
-			src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"
-			defer
-		></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js" defer></script>
 		<script src="scripts/LinkedList.js" defer></script>
 		<script src="scripts/canvasHelper.js" defer></script>
 		<script src="scripts/CanvasObjectHandler.js" defer></script>
@@ -23,37 +20,19 @@
 	<body>
 		<div class="header">
 			<div class="left-section">
-				<label for="dropdown"></label>
-				<select id="dropdown" class="selection">
-					<option value="Linked List">Linked List</option>
-					<option value="Doubly Linked List">
-						Doubly Linked List
-					</option>
-				</select>
+				<button class="reset-btn">Reorder List</button>
 			</div>
 			<div class="popup">Index out of bounds</div>
 			<div class="right-section">
 				<div class="input-section">
-					<div class="input-seperator">
+					<div class="input-separator">
 						<label for="index-input">Index: </label>
-						<input
-							type="number"
-							step="1"
-							class="index-input"
-							id="index-input"
-							value="0"
-						/>
+						<input type="number" step="1" class="index-input" id="index-input" value="0" />
 					</div>
 
-					<div class="input-seperator">
+					<div class="input-separator">
 						<label for="data-input">Data: </label>
-						<input
-							type="number"
-							step="1"
-							class="data-input"
-							id="data-input"
-							value="10"
-						/>
+						<input type="number" step="1" class="data-input" id="data-input" value="10" />
 					</div>
 				</div>
 

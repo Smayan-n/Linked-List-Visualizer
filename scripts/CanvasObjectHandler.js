@@ -77,30 +77,19 @@ class CanvasObjectHandler {
 		const nodes = [];
 		let curr = ll.head;
 
-		let x = 75;
-		let y = 75;
-		let flag = true;
+		const regularCoords = getRegularCoords(ll.length());
+		let index = 0;
 		//traversing through linked list
 		while (curr) {
 			nodes.push({
-				x: x,
-				y: y,
+				x: regularCoords[index].x,
+				y: regularCoords[index].y,
 				radius: 50,
 				data: curr.data,
 				color: "white",
 				visible: true,
 			});
-
-			//to calculate placement of the circles
-			x += (window.innerWidth - 50) / ll.length();
-			if (flag) {
-				y += 100;
-				flag = false;
-			} else {
-				y -= 100;
-				flag = true;
-			}
-
+			index++;
 			curr = curr.next;
 		}
 

@@ -65,6 +65,16 @@ canvas.addEventListener("mousedown", (e) => {
 	});
 });
 
+let reorderAnimStart = false;
+let reorderPositions;
+let reorderSteps;
+//reorder list
+$(".reset-btn").on("click", () => {
+	reorderPositions = getRegularCoords(ll.length());
+	reorderSteps = [];
+	reorderAnimStart = true;
+});
+
 //change text on delete and insert buttons depending on index input
 $(".index-input").on("change", () => {
 	let index = getIndex();
@@ -184,6 +194,7 @@ const prepend = () => {
 };
 
 const insert = () => {
+	//index validation
 	if (insertIndex > ll.length() || insertIndex < 0) {
 		createPopup("Index out of bounds", "red");
 		return;
@@ -269,6 +280,7 @@ const getData = () => {
 let animFrames = 0;
 const animSpeed = 60; //higher is slower animations
 
+//traversing animations variables
 let currTraverseAnimIndex = 0;
 let traverseIndex;
 
@@ -279,6 +291,32 @@ function draw() {
 	simpleCanvas.refresh(draw);
 
 	//-----------------animation sequences-------------------
+
+	//reorder Animation
+	if (reorderAnimStart) {
+		animFrames++;
+		//calculate the x and y steps once
+		if (animFrames === 1) {
+			canvasObjHandler.circles.forEach((circle, i) => {
+				xStep = (reorderPositions[i].x - circle.x) / (animSpeed * 1.5);
+				yStep = (reorderPositions[i].y - circle.y) / (animSpeed * 1.5);
+				reorderSteps.push({ xStep, yStep });
+			});
+		}
+		//animate circles moving to their regular
+		if (animFrames < animSpeed * 1.5) {
+			canvasObjHandler.circles.forEach((circle, i) => {
+				circle.x += reorderSteps[i].xStep;
+				circle.y += reorderSteps[i].yStep;
+				//update arrows as circles move
+				canvasObjHandler.generateArrows();
+			});
+		}
+		if (animFrames === animSpeed * 1.5) {
+			animFrames = 0;
+			reorderAnimStart = false;
+		}
+	}
 
 	//traverse animation
 	if (traverseAnimStart) {
