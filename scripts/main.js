@@ -17,7 +17,10 @@ window.addEventListener("resize", () => {
 	//relative positions before resizing
 	relativeCirclePositions = [];
 	canvasObjHandler.circles.forEach((circle) => {
-		relativeCirclePositions.push({ percentX: circle.x / canvas.width, percentY: circle.y / canvas.height });
+		relativeCirclePositions.push({
+			percentX: circle.x / canvas.width,
+			percentY: circle.y / canvas.height,
+		});
 	});
 	//resize canvas
 	canvas.width = window.innerWidth;
@@ -278,7 +281,7 @@ const getData = () => {
 
 //animation vars
 let animFrames = 0;
-const animSpeed = 60; //higher is slower animations
+const animSpeed = 56; //higher is slower animations
 
 //traversing animations variables
 let currTraverseAnimIndex = 0;
@@ -328,7 +331,10 @@ function draw() {
 			simpleCanvas.circle(c.x, c.y, c.radius, c.data, c.color);
 		}
 		//to skip arrow animation in some scenarios
-		if (animFrames === animSpeed && currTraverseAnimIndex >= (delOrInsertAnim ? traverseIndex : traverseIndex - 1)) {
+		if (
+			animFrames === animSpeed &&
+			currTraverseAnimIndex >= (delOrInsertAnim ? traverseIndex : traverseIndex - 1)
+		) {
 			animFrames = animSpeed * 2;
 		}
 		if (animFrames > animSpeed && animFrames < animSpeed * 2) {
