@@ -10,7 +10,7 @@ This tool is designed to help visualize and understand the basic concepts of lin
 
 # Usage: #
 * visit the githib page for this repo: https://smayan-n.github.io/Linked-List-Visualizer/
-* Diwnload or clone repository and open the `index.html` file
+* Download or clone repository and open the `index.html` file
 
 
 ![image](https://user-images.githubusercontent.com/86111841/214996800-6a97689a-a96b-4b7a-ab5a-5f66fcc58043.png)
