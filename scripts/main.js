@@ -319,7 +319,7 @@ function draw() {
 			});
 		}
 		//animate circles moving to their regular
-		if (animFrames < animSpeed * 1.5) {
+		if (animFrames < animSpeed * 1.5 + 1) {
 			canvasObjHandler.circles.forEach((circle, i) => {
 				circle.x += reorderSteps[i].xStep;
 				circle.y += reorderSteps[i].yStep;
@@ -327,7 +327,7 @@ function draw() {
 				canvasObjHandler.generateArrows();
 			});
 		}
-		if (animFrames === animSpeed * 1.5) {
+		if (animFrames === animSpeed * 1.5 + 1) {
 			animFrames = 0;
 			reorderAnimStart = false;
 		}
