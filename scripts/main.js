@@ -10,6 +10,19 @@ const simpleCanvas = new SimpleCanvas(ctx);
 const animator = new CanvasAnimation(simpleCanvas);
 const canvasObjHandler = new CanvasObjectHandler(simpleCanvas);
 
+//animation speed handler
+let animSpeed = 20; //higher is slower animations
+$(".anim-speed-slider").on("input", () => {
+	changeAnimSpeed();
+});
+const changeAnimSpeed = () => {
+	const slider = $(".anim-speed-slider");
+	//change label
+	$(".anim-speed-label").text("Animation Speed: (" + slider.val() + ")");
+	animSpeed = parseInt(slider.attr("max")) + parseInt(slider.attr("min")) - parseInt(slider.val());
+};
+changeAnimSpeed();
+
 //window resize event listener
 //resize canvas and regenerate circle and arrow positions so they stay in the same relative positions as before
 let relativeCirclePositions;
@@ -281,7 +294,6 @@ const getData = () => {
 
 //animation vars
 let animFrames = 0;
-const animSpeed = 56; //higher is slower animations
 
 //traversing animations variables
 let currTraverseAnimIndex = 0;

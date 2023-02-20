@@ -42,8 +42,21 @@
 
 .left-section{
     margin-left: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
     
 }
+.anim-speed-section{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
 .reset-btn{
     font-weight: 600;
     font-family: "poppins";
