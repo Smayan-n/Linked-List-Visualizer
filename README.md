@@ -9,7 +9,7 @@ This tool is designed to help visualize and understand the basic concepts of lin
   * ability to reset position of nodes
 
 # Usage: #
-* visit the githib page for this repo: https://smayan-n.github.io/Linked-List-Visualizer/
+* visit the github page for this repo for a live demo: https://smayan-n.github.io/Linked-List-Visualizer/
 * Download or clone repository and open the `index.html` file
 
 
